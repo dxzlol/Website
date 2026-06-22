@@ -1758,23 +1758,186 @@
 
             const REPO_RAW = 'https://raw.githubusercontent.com/dxzlol/67/main';
 
-            const FILES = [{
-                id: 'ui',
-                name: 'UI.lua',
-                url: REPO_RAW + '/UI.lua',
-                icon: '🖥️',
-                description: 'Merged UI: WaifuUI visuals + HomesickUI API — fully self‑contained.',
-                status: 'active',
-                tags: ['lua', 'ui', 'waifu', 'homesick']
-            }, {
-                id: 'survive',
-                name: 'survivehomelander.lua',
-                url: REPO_RAW + '/survivehomelander.lua',
-                icon: '👁️',
-                description: 'Survive Homelander ESP v6.4 — TempV disappearance fix + watermark sync.',
-                status: 'active',
-                tags: ['lua', 'esp', 'homelander', 'survive']
-            }];
+async function loadScripts() {
+    try {
+        scriptsGrid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
+                ⏳ Fetching scripts from GitHub...
+            </div>
+        `;
+
+        // Fetch the list of files from your repo using the GitHub API
+        const apiUrl = 'https://api.github.com/repos/dxzlol/67/contents/scripts';
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+            throw new Error(`GitHub API error: ${response.status}`);
+        }
+
+        const files = await response.json();
+
+        // Filter for .lua files only
+        const luaFiles = files.filter(file => file.name.endsWith('.lua'));
+
+        if (luaFiles.length === 0) {
+            scriptsGrid.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
+                    No .lua scripts found in the scripts folder.
+                </div>
+            `;
+            return;
+        }
+
+        // Fetch content for each .lua file
+        const results = await Promise.all(
+            luaFiles.map(async (file) => {
+                try {
+                    const resp = await fetch(file.download_url);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const content = await resp.text();
+                    const lines = content.split('\n');
+                    const totalLines = lines.length;
+                    const previewLines = lines.slice(0, 20).join('\n');
+                    let preview = previewLines.trim();
+                    if (!preview) {
+                        const firstChars = content.substring(0, 200);
+                        preview = firstChars ? `-- (first 200 chars) \n${firstChars}` : '-- (file is empty)';
+                    }
+                    // Auto-generate description from filename
+                    const description = file.name
+                        .replace('.lua', '')
+                        .replace(/([A-Z])/g, ' $1')
+                        .replace(/_/g, ' ')
+                        .trim();
+                    // Auto-generate tags from filename
+                    const tags = file.name
+                        .replace('.lua', '')
+                        .split(/[_-]/)
+                        .filter(t => t.length > 0)
+                        .map(t => t.toLowerCase());
+
+                    return {
+                        id: file.name.replace('.lua', ''),
+                        name: file.name,
+                        url: file.download_url,
+                        icon: '📜',
+                        description: description || 'A Lua script for Matcha.',
+                        status: 'active',
+                        tags: tags.length ? tags : ['lua'],
+                        content,
+                        preview,
+                        totalLines,
+                        error: null
+                    };
+                } catch (err) {
+                    return {
+                        id: file.name.replace('.lua', ''),
+                        name: file.name,
+                        url: file.download_url,
+                        icon: '📜',
+                        description: 'Failed to load content',
+                        status: 'active',
+                        tags: ['lua'],
+                        content: null,
+                        preview: `⚠️ Failed to load: ${err.message}`,
+                        totalLines: 0,
+                        error: err.message
+                    };
+                }
+            })
+        );
+
+        // Render cards
+        scriptsGrid.innerHTML = results.map((file) => {
+            const statusClass = file.status === 'active' ? '' : 'pink';
+            const statusLabel = file.status.charAt(0).toUpperCase() + file.status.slice(1);
+            const loadString = `loadstring(game:HttpGet("${file.url}"))()`;
+
+            return `
+                <div class="script-card reveal" data-id="${file.id}">
+                    <div class="card-top">
+                        <span class="card-icon">${file.icon}</span>
+                        <span class="card-status ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <h3>${file.name}</h3>
+                    <p class="card-desc">${file.description}</p>
+
+                    <div class="code-preview-wrapper">
+                        <div class="code-header">
+                            <span class="lang">Lua</span>
+                            <span class="lines-count">${file.totalLines} lines</span>
+                        </div>
+                        <pre id="preview-${file.id}" class="${file.error ? '' : 'expanded'}"><code>${escapeHtml(file.preview)}</code></pre>
+                        <div class="code-actions">
+                            <button class="btn btn-copy" data-url="${file.url}" data-loadstring="${encodeURIComponent(loadString)}">
+                                📋 Copy Loadstring
+                            </button>
+                            <button class="btn btn-expand" data-id="${file.id}">
+                                ${file.error ? '🔒 Unavailable' : '🔽 Expand'}
+                            </button>
+                            <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="btn" style="text-decoration:none;">
+                                📄 Raw
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <span>${file.error ? '⚠️ ' + file.error : '✅ Loaded'}</span>
+                        <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="repo-link">
+                            view raw →
+                        </a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Attach event listeners for copy and expand
+        document.querySelectorAll('.btn-copy').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const rawUrl = this.dataset.url;
+                const fullCmd = `loadstring(game:HttpGet("${rawUrl}"))()`;
+                navigator.clipboard.writeText(fullCmd).then(() => {
+                    showToast(`✅ Copied loadstring for ${this.closest('.script-card').querySelector('h3').textContent}`);
+                }).catch(() => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = fullCmd;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showToast('✅ Copied to clipboard (fallback)');
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-expand').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const id = this.dataset.id;
+                const pre = document.getElementById(`preview-${id}`);
+                if (!pre) return;
+                const isExpanded = pre.classList.toggle('expanded');
+                this.textContent = isExpanded ? '🔼 Collapse' : '🔽 Expand';
+            });
+        });
+
+        // Re-trigger reveal
+        document.querySelectorAll('.reveal').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight) {
+                el.classList.add('visible');
+            }
+        });
+
+    } catch (err) {
+        scriptsGrid.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--pink);">
+                ❌ Failed to load scripts: ${err.message}
+            </div>
+        `;
+    }
+}
 
             const README_URL = 'https://raw.githubusercontent.com/dxzlol/67/refs/heads/main/README.md';
 
