@@ -66,9 +66,9 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 200px;
-            height: 200px;
-            opacity: 0.06;
+            width: 180px;
+            height: 180px;
+            opacity: 0.05;
             pointer-events: none;
             z-index: 0;
             user-select: none;
@@ -376,8 +376,8 @@
             gap: 12px;
         }
         .hero-pfp {
-            width: 160px;
-            height: 160px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
             border: 4px solid var(--pink);
             box-shadow: 0 0 48px var(--pink-glow);
@@ -440,13 +440,15 @@
         }
 
         /* ============================================================
-                   TERMINAL
+                   TERMINAL (restored)
                    ============================================================ */
         .hero-visual {
             display: flex;
             justify-content: center;
             align-items: center;
             animation: fadeUp 0.9s ease-out 0.2s both;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .terminal-box {
@@ -646,6 +648,7 @@
             border-radius: var(--radius-sm);
             overflow: hidden;
             margin-bottom: 14px;
+            flex-shrink: 0;
         }
         .code-preview-wrapper .code-header {
             display: flex;
@@ -678,15 +681,15 @@
             transition: max-height 0.4s ease;
             white-space: pre-wrap;
             word-break: break-all;
-            color: var(--text-secondary);
         }
         .code-preview-wrapper pre.expanded {
             max-height: 600px;
             overflow-y: auto;
         }
+        /* Force code text to be bright white for visibility */
         .code-preview-wrapper pre code {
             display: block;
-            color: var(--text-secondary);
+            color: #f0f6fc !important; /* override to ensure visibility */
         }
 
         .code-actions {
@@ -1045,7 +1048,6 @@
     WATERMARK (Matcha Icon)
     ============================================================ -->
     <div class="watermark">
-        <!-- Your official Matcha icon from Discord CDN -->
         <img src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
     </div>
 
@@ -1123,15 +1125,30 @@
             </div>
 
             <div class="hero-visual">
-                <!-- Profile Picture Section -->
-                <div class="hero-pfp-section">
-                    <img class="hero-pfp" src="https://github.com/dxzlol.png" alt="dxzlol" />
-                    <div class="hero-pfp-label">
-                        <span class="highlight-name">dxzlol</span> · maker
+                <!-- Terminal (restored) -->
+                <div class="terminal-box">
+                    <div class="terminal-header">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-title">~/67/matcha (lua)</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="line"><span class="prompt">$</span> <span class="cmd">git clone https://github.com/dxzlol/67</span></div>
+                        <div class="line"><span class="output">Cloning into '67'...</span></div>
+                        <div class="line"><span class="output">remote: Enumerating objects: <span class="highlight-out">47</span>, done.</span></div>
+                        <div class="line"><span class="prompt">$</span> <span class="cmd">cd 67/scripts</span></div>
+                        <div class="line"><span class="prompt">$</span> <span class="cmd">ls -la</span></div>
+                        <div class="line"><span class="output">├── <span class="highlight-out">UI.lua</span>              · WaifuUI + HomesickUI</span></div>
+                        <div class="line"><span class="output">├── <span class="highlight-out">survivehomelander.lua</span>  · ESP + Homelander detection</span></div>
+                        <div class="line"><span class="output">└── <span class="highlight-out">README.md</span>            · project docs</span></div>
                     </div>
                 </div>
-                <!-- (Optional: you could also keep the terminal here, but we replaced it with PFP for uniqueness) -->
-                <!-- I'll keep the PFP only, but you can swap back to terminal if you prefer -->
+                <!-- Profile picture (small, below terminal) -->
+                <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                    <img src="https://github.com/dxzlol.png" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--pink);" alt="dxzlol" />
+                    <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">dxzlol</span>
+                </div>
             </div>
         </div>
     </section>
@@ -1299,10 +1316,15 @@
                                 const content = await resp.text();
                                 const lines = content.split('\n');
                                 const totalLines = lines.length;
-                                const previewLines = lines.slice(0, 15).join('\n');
-                                return { ...file, content, preview: previewLines, totalLines, error: null };
+                                // Take first 20 lines, but if the file is shorter, take all.
+                                const previewLines = lines.slice(0, 20).join('\n');
+                                // If preview is empty after trimming, show a placeholder
+                                const preview = previewLines.trim() || '-- (file loaded, but first lines are empty)';
+                                console.log(`✅ Loaded ${file.name}: ${totalLines} lines, preview:`, preview.substring(0, 80));
+                                return { ...file, content, preview, totalLines, error: null };
                             } catch (err) {
-                                return { ...file, content: null, preview: '⚠️ Failed to load', totalLines: 0,
+                                console.error(`❌ Failed to load ${file.name}:`, err);
+                                return { ...file, content: null, preview: `⚠️ Failed to load: ${err.message}`, totalLines: 0,
                                     error: err.message };
                             }
                         })
@@ -1329,7 +1351,7 @@
                                         <span class="lang">Lua</span>
                                         <span class="lines-count">${file.totalLines} lines</span>
                                     </div>
-                                    <pre id="preview-${file.id}" class="${file.error ? '' : 'expanded'}"><code>${escapeHtml(file.error ? file.preview : file.preview)}</code></pre>
+                                    <pre id="preview-${file.id}" class="${file.error ? '' : 'expanded'}"><code>${escapeHtml(file.preview)}</code></pre>
                                     <div class="code-actions">
                                         <button class="btn btn-copy" data-url="${file.url}" data-loadstring="${encodeURIComponent(loadString)}">
                                             📋 Copy Loadstring
