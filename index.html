@@ -26,13 +26,11 @@
             --text-secondary: #8b949e;
             --text-muted: #484f58;
 
-            /* Matcha greens */
             --matcha-dark: #2d5a27;
             --matcha: #4caf50;
             --matcha-light: #81c784;
             --matcha-glow: rgba(76, 175, 80, 0.15);
 
-            /* Your pink */
             --pink: #f48fb1;
             --pink-dark: #f06292;
             --pink-glow: rgba(244, 143, 177, 0.15);
@@ -60,7 +58,7 @@
         }
 
         /* ============================================================
-                   WATERMARK (Background Image)
+                   WATERMARK
                    ============================================================ */
         .watermark {
             position: fixed;
@@ -368,41 +366,6 @@
             gap: 14px;
         }
 
-        /* Profile Picture in Hero */
-        .hero-pfp-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-        .hero-pfp {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            border: 4px solid var(--pink);
-            box-shadow: 0 0 48px var(--pink-glow);
-            object-fit: cover;
-            transition: var(--transition);
-        }
-        .hero-pfp:hover {
-            transform: scale(1.03);
-            border-color: var(--matcha);
-            box-shadow: 0 0 64px var(--matcha-glow);
-        }
-        .hero-pfp-label {
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            background: var(--bg-card);
-            padding: 4px 20px;
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-        }
-        .hero-pfp-label .highlight-name {
-            color: var(--pink);
-            font-weight: 600;
-        }
-
         .btn {
             display: inline-flex;
             align-items: center;
@@ -440,7 +403,7 @@
         }
 
         /* ============================================================
-                   TERMINAL (restored)
+                   TERMINAL
                    ============================================================ */
         .hero-visual {
             display: flex;
@@ -681,15 +644,16 @@
             transition: max-height 0.4s ease;
             white-space: pre-wrap;
             word-break: break-all;
+            background: transparent;
         }
         .code-preview-wrapper pre.expanded {
             max-height: 600px;
             overflow-y: auto;
         }
-        /* Force code text to be bright white for visibility */
         .code-preview-wrapper pre code {
             display: block;
-            color: #f0f6fc !important; /* override to ensure visibility */
+            color: #f0f6fc !important; /* force white for visibility */
+            background: transparent !important;
         }
 
         .code-actions {
@@ -958,9 +922,6 @@
             .hero-actions {
                 justify-content: center;
             }
-            .hero-pfp-section {
-                align-items: center;
-            }
             .scripts-grid {
                 grid-template-columns: 1fr;
             }
@@ -1014,10 +975,6 @@
             .code-preview-wrapper pre {
                 font-size: 0.7rem;
                 padding: 10px 12px;
-            }
-            .hero-pfp {
-                width: 120px;
-                height: 120px;
             }
             .watermark {
                 width: 80px;
@@ -1125,7 +1082,6 @@
             </div>
 
             <div class="hero-visual">
-                <!-- Terminal (restored) -->
                 <div class="terminal-box">
                     <div class="terminal-header">
                         <span class="terminal-dot red"></span>
@@ -1144,7 +1100,6 @@
                         <div class="line"><span class="output">└── <span class="highlight-out">README.md</span>            · project docs</span></div>
                     </div>
                 </div>
-                <!-- Profile picture (small, below terminal) -->
                 <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
                     <img src="https://github.com/dxzlol.png" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--pink);" alt="dxzlol" />
                     <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">dxzlol</span>
@@ -1154,7 +1109,7 @@
     </section>
 
     <!-- ============================================================
-    SCRIPTS SECTION (live from GitHub)
+    SCRIPTS SECTION
     ============================================================ -->
     <section class="scripts" id="scripts">
         <div class="container">
@@ -1171,10 +1126,14 @@
                         Fetched directly from <strong>dxzlol/67</strong> — always up to date.
                     </p>
                 </div>
-                <a href="https://github.com/dxzlol/67/tree/main" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z"/><path d="M8 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 4z"/></svg>
-                    View All on GitHub
-                </a>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <button id="reloadScripts" class="btn btn-outline btn-sm">
+                        🔄 Reload
+                    </button>
+                    <a href="https://github.com/dxzlol/67/tree/main" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+                        View All on GitHub
+                    </a>
+                </div>
             </div>
 
             <div class="scripts-grid" id="scriptsGrid">
@@ -1187,7 +1146,7 @@
     </section>
 
     <!-- ============================================================
-    README SECTION (live from GitHub)
+    README SECTION
     ============================================================ -->
     <section class="readme-section" id="readme">
         <div class="container">
@@ -1279,6 +1238,7 @@
             const navLinks = document.getElementById('navLinks');
             const canvas = document.getElementById('particles-canvas');
             const toast = document.getElementById('toast');
+            const reloadBtn = document.getElementById('reloadScripts');
 
             let toastTimeout = null;
 
@@ -1292,7 +1252,7 @@
                 if (toastTimeout) clearTimeout(toastTimeout);
                 toastTimeout = setTimeout(() => {
                     toast.classList.remove('show');
-                }, 2500);
+                }, 3000);
             }
 
 
@@ -1318,9 +1278,14 @@
                                 const totalLines = lines.length;
                                 // Take first 20 lines, but if the file is shorter, take all.
                                 const previewLines = lines.slice(0, 20).join('\n');
-                                // If preview is empty after trimming, show a placeholder
-                                const preview = previewLines.trim() || '-- (file loaded, but first lines are empty)';
-                                console.log(`✅ Loaded ${file.name}: ${totalLines} lines, preview:`, preview.substring(0, 80));
+                                // If preview is empty after trimming, show a placeholder with the first few characters of the file
+                                let preview = previewLines.trim();
+                                if (!preview) {
+                                    // The file may have leading spaces or empty lines, try to show something
+                                    const firstChars = content.substring(0, 200);
+                                    preview = firstChars ? `-- (first 200 chars) \n${firstChars}` : '-- (file is empty)';
+                                }
+                                console.log(`✅ Loaded ${file.name}: ${totalLines} lines, preview length: ${preview.length}`);
                                 return { ...file, content, preview, totalLines, error: null };
                             } catch (err) {
                                 console.error(`❌ Failed to load ${file.name}:`, err);
@@ -1659,6 +1624,14 @@
             // Load live data
             loadScripts();
             loadReadme();
+
+            // Reload button
+            if (reloadBtn) {
+                reloadBtn.addEventListener('click', () => {
+                    showToast('🔄 Reloading scripts...');
+                    loadScripts();
+                });
+            }
 
             console.log('🚀 dxzlol/67 — Live from GitHub. Matcha + Pink theme loaded.');
 
