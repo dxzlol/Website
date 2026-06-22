@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UI.lua Documentation · dxzlol/67</title>
+
+    <style>
+        /* ============================================================
+                   RESET & BASE
+                   ============================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2333;
+            --bg-card-hover: #252d3f;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --text-muted: #484f58;
+
+            --matcha-dark: #2d5a27;
+            --matcha: #4caf50;
+            --matcha-light: #81c784;
+            --matcha-glow: rgba(76, 175, 80, 0.15);
+
+            --pink: #f48fb1;
+            --pink-dark: #f06292;
+            --pink-glow: rgba(244, 143, 177, 0.15);
+
+            --border-color: #30363d;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --radius: 12px;
+            --radius-sm: 6px;
+            --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 80px 0 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ============================================================
+                   NAV
+                   ============================================================ */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(13, 17, 23, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .nav-logo .logo-bracket {
+            color: var(--pink);
+        }
+        .nav-logo .logo-name {
+            color: var(--text-primary);
+        }
+        .nav-logo .logo-repo {
+            color: var(--matcha);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--pink);
+            transition: var(--transition);
+        }
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-gh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            background: var(--pink);
+            color: #0d1117 !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .nav-gh-btn:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 24px var(--pink-glow);
+        }
+
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+        .nav-hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: var(--text-secondary);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+        .nav-hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        .nav-hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+        .nav-hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* ============================================================
+                   DOCS HEADER
+                   ============================================================ */
+        .docs-header {
+            margin-bottom: 32px;
+        }
+        .docs-header .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--pink);
+            background: rgba(244, 143, 177, 0.08);
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(244, 143, 177, 0.15);
+            margin-bottom: 12px;
+        }
+        .docs-header .section-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+        .docs-header .section-title .highlight {
+            background: linear-gradient(135deg, var(--matcha), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .docs-header .section-sub {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 560px;
+        }
+
+        .docs-stats {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* ============================================================
+                   SEARCH
+                   ============================================================ */
+        .docs-search-wrapper {
+            position: relative;
+            max-width: 500px;
+            margin-bottom: 32px;
+        }
+        .docs-search-wrapper input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .docs-search-wrapper input:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px var(--pink-glow);
+        }
+        .docs-search-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+        .docs-search-wrapper .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 1.1rem;
+        }
+        .docs-search-wrapper .shortcut-hint {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            pointer-events: none;
+        }
+
+        /* ============================================================
+                   DOCS GRID
+                   ============================================================ */
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+        }
+
+        .doc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            transition: var(--transition);
+            position: relative;
+        }
+        .doc-card:hover {
+            border-color: rgba(244, 143, 177, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .doc-card .doc-name {
+            font-family: var(--font-mono);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--pink);
+            margin-bottom: 2px;
+        }
+        .doc-card .doc-signature {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--matcha-light);
+            margin-bottom: 8px;
+        }
+        .doc-card .doc-desc {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .doc-card .doc-category {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            padding: 2px 12px;
+            border-radius: 12px;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--matcha-light);
+            border: 1px solid rgba(76, 175, 80, 0.15);
+            margin-bottom: 12px;
+        }
+        .doc-card .doc-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+        .doc-card .doc-details .detail-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .doc-card .doc-details .detail-row .label {
+            color: var(--text-muted);
+            min-width: 70px;
+            flex-shrink: 0;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+        .doc-card .doc-details .detail-row .value {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        .doc-card .doc-example {
+            margin-top: 12px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 80px;
+            overflow-y: auto;
+            transition: max-height 0.3s ease;
+        }
+        .doc-card .doc-example.expanded {
+            max-height: 300px;
+        }
+        .doc-card .doc-example-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            padding: 4px 0;
+            transition: var(--transition);
+        }
+        .doc-card .doc-example-toggle:hover {
+            color: var(--pink);
+        }
+
+        .doc-card.hidden {
+            display: none;
+        }
+
+        .no-docs-found {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .no-docs-found .big-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* ============================================================
+                   SECRET DOCS (Easter egg)
+                   ============================================================ */
+        .doc-card.secret {
+            border-color: var(--pink);
+        }
+        .doc-card.secret .doc-name {
+            color: var(--pink-dark);
+        }
+        .doc-card.secret .doc-category {
+            background: rgba(244, 143, 177, 0.15);
+            color: var(--pink-dark);
+            border-color: rgba(244, 143, 177, 0.2);
+        }
+
+        /* ============================================================
+                   FOOTER
+                   ============================================================ */
+        .footer {
+            margin-top: 60px;
+            padding: 40px 0 32px;
+            border-top: 1px solid var(--border-color);
+        }
+        .footer .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer .copy {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .footer .copy a {
+            color: var(--pink);
+            text-decoration: none;
+        }
+        .footer .copy a:hover {
+            color: var(--matcha);
+        }
+        .footer .socials {
+            display: flex;
+            gap: 18px;
+        }
+        .footer .socials a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .footer .socials a:hover {
+            color: var(--pink);
+        }
+
+        /* ============================================================
+                   TOAST
+                   ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--matcha);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ============================================================
+                   RESPONSIVE
+                   ============================================================ */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: var(--bg-secondary);
+                flex-direction: column;
+                padding: 80px 32px 32px;
+                gap: 20px;
+                border-left: 1px solid var(--border-color);
+                transition: var(--transition);
+                align-items: flex-start;
+            }
+            .nav-links.open {
+                right: 0;
+            }
+            .nav-hamburger {
+                display: flex;
+                z-index: 101;
+            }
+
+            .docs-grid {
+                grid-template-columns: 1fr;
+            }
+            .docs-search-wrapper {
+                max-width: 100%;
+            }
+            .docs-search-wrapper .shortcut-hint {
+                display: none;
+            }
+            .footer .container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .doc-card {
+                padding: 18px 16px;
+            }
+            .docs-search-wrapper input {
+                font-size: 0.85rem;
+                padding: 8px 12px 8px 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    TOAST
+    ============================================================ -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ============================================================
+    NAVBAR
+    ============================================================ -->
+    <nav class="navbar" id="navbar" role="navigation">
+        <div class="container">
+            <a href="/" class="nav-logo">
+                <span class="logo-bracket">⟨</span>
+                <span class="logo-name">dxzlol</span>
+                <span class="logo-bracket">⟩</span>
+                <span style="color:var(--text-muted);font-weight:300;">/</span>
+                <span class="logo-repo">67</span>
+            </a>
+
+            <ul class="nav-links" id="navLinks" role="menubar">
+                <li role="none"><a href="/" role="menuitem">Home</a></li>
+                <li role="none"><a href="/docs" role="menuitem" style="color:var(--pink);">Docs</a></li>
+                <li role="none">
+                    <a href="https://github.com/dxzlol/67" target="_blank" rel="noopener noreferrer" class="nav-gh-btn" role="menuitem">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+                        GitHub
+                    </a>
+                </li>
+            </ul>
+
+            <button class="nav-hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+    MAIN CONTENT
+    ============================================================ -->
+    <main class="container">
+        <div class="docs-header">
+            <span class="section-label">📖 API Reference</span>
+            <h1 class="section-title">
+                UI.lua <span class="highlight">Documentation</span>
+            </h1>
+            <p class="section-sub">
+                Complete reference for the merged WaifuUI + HomesickUI library.
+            </p>
+            <div class="docs-stats">
+                <span id="docCount">0</span> functions
+            </div>
+        </div>
+
+        <!-- Search bar -->
+        <div class="docs-search-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="docsSearch" placeholder="Search functions, descriptions, categories..." />
+            <span class="shortcut-hint">⌘K</span>
+        </div>
+
+        <!-- Docs grid -->
+        <div class="docs-grid" id="docsGrid">
+            <!-- Injected by JavaScript -->
+            <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
+                Loading documentation...
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================
+    FOOTER
+    ============================================================ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="copy">
+                © 2026 <a href="https://github.com/dxzlol" target="_blank" rel="noopener noreferrer">dxzlol</a>
+                · Built with <span style="color:var(--pink);">❤</span>
+                · <span style="color:var(--text-muted);">67/matcha (Lua)</span>
+            </div>
+            <div class="socials">
+                <a href="https://github.com/dxzlol" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://github.com/dxzlol/67" target="_blank" rel="noopener noreferrer">Repo</a>
+                <a href="/" style="color:var(--pink);">← Home</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================================================
+            // DOCS DATA (same as main page)
+            // ============================================================
+
+            const DOCS_DATA = [{
+                name: 'UI:CreateWindow',
+                signature: 'UI:CreateWindow(title, size)',
+                description: 'Creates a new window with the given title and size. Returns a window object with methods for adding UI elements.',
+                category: 'Window',
+                params: [
+                    { name: 'title', type: 'string', description: 'The window title displayed in the title bar.' },
+                    { name: 'size', type: 'table', description: 'A table with width and height: {width, height}.' }
+                ],
+                returns: 'Window object with methods: CreateButton, CreateLabel, CreateToggle, etc.',
+                example: 'local win = UI:CreateWindow("My Script", {400, 300})'
+            }, {
+                name: 'Window:CreateButton',
+                signature: 'Window:CreateButton(text, callback)',
+                description: 'Adds a clickable button to the window. The callback function is executed when the button is clicked.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'The label displayed on the button.' },
+                    { name: 'callback', type: 'function', description: 'Function called when the button is clicked.' }
+                ],
+                returns: 'Button object (can be used to update the button later).',
+                example: 'win:CreateButton("Click me", function() print("Hello!") end)'
+            }, {
+                name: 'Window:CreateLabel',
+                signature: 'Window:CreateLabel(text)',
+                description: 'Adds a static text label to the window.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'The label text to display.' }
+                ],
+                returns: 'Label object.',
+                example: 'win:CreateLabel("Welcome to the script!")'
+            }, {
+                name: 'Window:CreateToggle',
+                signature: 'Window:CreateToggle(text, default, callback)',
+                description: 'Adds a toggle switch that can be turned on/off.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'Label next to the toggle.' },
+                    { name: 'default', type: 'boolean', description: 'Initial state (true = on).' },
+                    { name: 'callback', type: 'function', description: 'Called when the toggle state changes. Receives the new state (boolean).' }
+                ],
+                returns: 'Toggle object.',
+                example: 'win:CreateToggle("Enable ESP", true, function(state) print("ESP:", state) end)'
+            }, {
+                name: 'Window:CreateSlider',
+                signature: 'Window:CreateSlider(text, min, max, default, callback)',
+                description: 'Adds a slider for numeric input within a range.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'Label for the slider.' },
+                    { name: 'min', type: 'number', description: 'Minimum value.' },
+                    { name: 'max', type: 'number', description: 'Maximum value.' },
+                    { name: 'default', type: 'number', description: 'Initial value.' },
+                    { name: 'callback', type: 'function', description: 'Called when the slider changes. Receives the new value.' }
+                ],
+                returns: 'Slider object.',
+                example: 'win:CreateSlider("Speed", 0, 100, 50, function(val) print("Speed:", val) end)'
+            }, {
+                name: 'Window:CreateDropdown',
+                signature: 'Window:CreateDropdown(text, options, default, callback)',
+                description: 'Adds a dropdown menu with selectable options.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'Label for the dropdown.' },
+                    { name: 'options', type: 'table', description: 'Array of option strings.' },
+                    { name: 'default', type: 'string', description: 'Default selected option (must match an option).' },
+                    { name: 'callback', type: 'function', description: 'Called when an option is selected. Receives the selected option string.' }
+                ],
+                returns: 'Dropdown object.',
+                example: 'win:CreateDropdown("Mode", {"Auto", "Manual", "Hybrid"}, "Auto", function(opt) print("Mode:", opt) end)'
+            }, {
+                name: 'Window:CreateTextInput',
+                signature: 'Window:CreateTextInput(placeholder, callback)',
+                description: 'Adds a text input field where users can type custom values.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'placeholder', type: 'string', description: 'Placeholder text shown when empty.' },
+                    { name: 'callback', type: 'function', description: 'Called when the user submits text. Receives the entered string.' }
+                ],
+                returns: 'TextInput object.',
+                example: 'win:CreateTextInput("Enter name...", function(text) print("Name:", text) end)'
+            }, {
+                name: 'Window:CreateTab',
+                signature: 'Window:CreateTab(name)',
+                description: 'Creates a new tab for organizing UI elements in a tabbed interface.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'name', type: 'string', description: 'The tab name displayed in the header.' }
+                ],
+                returns: 'Tab object (can be used to add elements to this tab).',
+                example: 'local settingsTab = win:CreateTab("Settings")'
+            }, {
+                name: 'UI:GetVersion',
+                signature: 'UI:GetVersion()',
+                description: 'Returns the current version of the UI library.',
+                category: 'Utility',
+                params: [],
+                returns: 'Version string (e.g., "2.1.0").',
+                example: 'print(UI:GetVersion())'
+            }, {
+                name: 'UI:SetTheme',
+                signature: 'UI:SetTheme(theme)',
+                description: 'Sets the color theme of the UI. Built‑in themes: "matcha", "pink", "dark", "light".',
+                category: 'Utility',
+                params: [
+                    { name: 'theme', type: 'string', description: 'Theme name: "matcha", "pink", "dark", or "light".' }
+                ],
+                returns: 'nil',
+                example: 'UI:SetTheme("pink")'
+            }, {
+                name: 'Window:Destroy',
+                signature: 'Window:Destroy()',
+                description: 'Closes and removes the window from the screen. All children are destroyed automatically.',
+                category: 'Window Methods',
+                params: [],
+                returns: 'nil',
+                example: 'win:Destroy()'
+            }, {
+                name: 'Window:SetSize',
+                signature: 'Window:SetSize(width, height)',
+                description: 'Resizes the window to the specified dimensions.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'width', type: 'number', description: 'New width in pixels.' },
+                    { name: 'height', type: 'number', description: 'New height in pixels.' }
+                ],
+                returns: 'nil',
+                example: 'win:SetSize(500, 400)'
+            }];
+
+            // ============================================================
+            // SECRET DOCS (Easter egg)
+            // ============================================================
+
+            const SECRET_DOCS = [{
+                name: 'How to exit Vim',
+                signature: ':wq (impossible)',
+                description: 'You don\'t. Vim exits you. The only winning move is not to play.',
+                category: '🧙‍♂️ Life Hacks',
+                params: [],
+                returns: 'Despair.',
+                example: 'sudo rm -rf / --no-preserve-root'
+            }, {
+                name: 'How to touch grass',
+                signature: 'grass.touch()',
+                description: 'Step 1: Close this tab. Step 2: Go outside. Step 3: Touch the green stuff. It\'s not that hard, bro.',
+                category: '🌿 Wellness',
+                params: [],
+                returns: 'Grass (it\'s soft, trust me)',
+                example: 'while true do touch(grass) end'
+            }, {
+                name: 'The meaning of life',
+                signature: '42',
+                description: '42, obviously. Did you even read the book? Also, it\'s the answer to everything.',
+                category: '🤯 Philosophy',
+                params: [],
+                returns: 'The answer to life, the universe, and everything.',
+                example: 'print("The answer is", 42)'
+            }, {
+                name: 'How to read the docs',
+                signature: 'read(docs)',
+                description: 'You\'re already doing it. Congrats! You\'re literally reading the docs right now. Pat yourself on the back.',
+                category: '📖 Meta',
+                params: [],
+                returns: 'Knowledge (and a sense of pride)',
+                example: 'while true do read(self) end'
+            }, {
+                name: 'How to fix your code',
+                signature: 'fix(code)',
+                description: 'Have you tried turning it off and on again? If that doesn\'t work, blame the compiler. It\'s always the compiler\'s fault.',
+                category: '🔧 Debugging',
+                params: [],
+                returns: 'A false sense of security.',
+                example: 'function fix() print("It works on my machine") end'
+            }, {
+                name: 'How to get a girlfriend',
+                signature: 'dating.get()',
+                description: 'Ask dxzlol, they have rizz. Or just write a dating sim in Lua and hope for the best.',
+                category: '❤️ Relationships',
+                params: [],
+                returns: 'Probably loneliness, but we believe in you.',
+                example: 'local gf = getGirlfriend() -- returns nil 90% of the time'
+            }, {
+                name: 'Why is the UI pink?',
+                signature: 'UI:GetColor()',
+                description: 'Because matcha needed a glow-up. Also, pink is objectively the best color. Don\'t @ me.',
+                category: '🎨 Design',
+                params: [],
+                returns: 'Aesthetic satisfaction.',
+                example: 'UI:SetTheme("pink") -- you know you want to'
+            }, {
+                name: 'How to stop the lol theme',
+                signature: 'lol:disable()',
+                description: 'Type "lol" anywhere. Wait, you already did that. Now you\'re stuck in an infinite loop. Enjoy the yellow.',
+                category: '🌀 Paradox',
+                params: [],
+                returns: 'More yellow.',
+                example: 'while true do print("lol") end -- you\'re welcome'
+            }, {
+                name: 'How to make a sandwich',
+                signature: 'sandwich.make(bread, filling)',
+                description: 'Step 1: Get bread. Step 2: Put stuff on it. Step 3: Eat. You\'re welcome. This is the most important documentation.',
+                category: '🥪 Culinary Arts',
+                params: [
+                    { name: 'bread', type: 'string', description: 'Type of bread (white, whole wheat, sourdough, etc.).' },
+                    { name: 'filling', type: 'table', description: 'Array of ingredients (cheese, meat, veggies, etc.).' }
+                ],
+                returns: 'A delicious sandwich (or a mess, depends on your skills).',
+                example: 'sandwich.make("sourdough", {"cheese", "ham", "lettuce"})'
+            }, {
+                name: 'How to talk to women',
+                signature: 'social.interact(woman)',
+                description: 'Step 1: Be confident. Step 2: Say "hello". Step 3: Run away. It works 10% of the time, every time.',
+                category: '💀 Social Skills',
+                params: [],
+                returns: 'Rejection, but you\'ll get used to it.',
+                example: 'social.interact(woman) -- error: attempt to call nil value'
+            }, {
+                name: 'The secret to happiness',
+                signature: 'happiness.get()',
+                description: 'It\'s not money. It\'s not fame. It\'s... actually, it\'s a clean codebase. A clean codebase is the secret to happiness.',
+                category: '🌟 Inspiration',
+                params: [],
+                returns: 'A warm feeling in your heart (and a working linter).',
+                example: 'while true do cleanCodebase() end'
+            }, {
+                name: 'How to become a wizard',
+                signature: 'wizard.become()',
+                description: 'Step 1: Write a Lua script. Step 2: It works on the first try. Step 3: You are now a wizard. Congratulations!',
+                category: '🧙‍♂️ Arcane',
+                params: [],
+                returns: 'A pointy hat and a staff.',
+                example: 'wizard.become() -- requires 1000 hours of debugging'
+            }];
+
+
+            // ============================================================
+            // DOM REFS
+            // ============================================================
+
+            const docsGrid = document.getElementById('docsGrid');
+            const docsSearch = document.getElementById('docsSearch');
+            const docCount = document.getElementById('docCount');
+            const toast = document.getElementById('toast');
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+
+            let toastTimeout = null;
+            let secretDocsActive = false;
+
+            // ============================================================
+            // TOAST
+            // ============================================================
+
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+
+
+            // ============================================================
+            // RENDER DOCS
+            // ============================================================
+
+            function renderDocs(filter = '') {
+                const query = filter.toLowerCase().trim();
+
+                // Secret trigger
+                if (query === 'lol') {
+                    if (!secretDocsActive) {
+                        secretDocsActive = true;
+                        showToast('🤣 Secret docs unlocked! Type "lol" again to go back.');
+                    } else {
+                        secretDocsActive = false;
+                        showToast('🔙 Back to normal docs.');
+                        docsSearch.value = '';
+                        renderDocs('');
+                        return;
+                    }
+                }
+
+                if (secretDocsActive) {
+                    renderSecretDocs(query);
+                    return;
+                }
+
+                let filtered = DOCS_DATA;
+                if (query) {
+                    filtered = DOCS_DATA.filter(doc =>
+                        doc.name.toLowerCase().includes(query) ||
+                        doc.description.toLowerCase().includes(query) ||
+                        doc.category.toLowerCase().includes(query) ||
+                        (doc.signature && doc.signature.toLowerCase().includes(query))
+                    );
+                }
+
+                docCount.textContent = filtered.length;
+
+                if (filtered.length === 0) {
+                    docsGrid.innerHTML = `
+                        <div class="no-docs-found">
+                            <span class="big-emoji">🔍</span>
+                            <h3 style="color:var(--text-primary);margin-bottom:8px;">No matching functions found</h3>
+                            <p style="color:var(--text-secondary);">Try a different search term</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                docsGrid.innerHTML = filtered.map((doc) => {
+                    let paramsHtml = '';
+                    if (doc.params && doc.params.length > 0) {
+                        paramsHtml = doc.params.map(p =>
+                            `<div class="detail-row">
+                                <span class="label">${p.name}</span>
+                                <span class="value"><span style="color:var(--matcha-light);">${p.type}</span> — ${p.description}</span>
+                            </div>`
+                        ).join('');
+                    } else {
+                        paramsHtml = `<div class="detail-row"><span class="label">Params</span><span class="value">None</span></div>`;
+                    }
+
+                    const returnsHtml = doc.returns ?
+                        `<div class="detail-row"><span class="label">Returns</span><span class="value">${doc.returns}</span></div>` :
+                        '';
+
+                    const exampleId = 'example-' + doc.name.replace(/[^a-zA-Z0-9]/g, '');
+                    const exampleHtml = doc.example ?
+                        `
+                        <button class="doc-example-toggle" onclick="toggleExample('${exampleId}')">📖 Show Example</button>
+                        <div class="doc-example" id="${exampleId}" style="max-height:0;padding:0;overflow:hidden;border:none;margin-top:4px;">
+                            <code>${escapeHtml(doc.example)}</code>
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="doc-card">
+                            <div class="doc-name">${escapeHtml(doc.name)}</div>
+                            ${doc.signature ? `<div class="doc-signature">${escapeHtml(doc.signature)}</div>` : ''}
+                            <div class="doc-category">${escapeHtml(doc.category)}</div>
+                            <div class="doc-desc">${escapeHtml(doc.description)}</div>
+                            <div class="doc-details">
+                                ${paramsHtml}
+                                ${returnsHtml}
+                            </div>
+                            ${exampleHtml}
+                        </div>
+                    `;
+                }).join('');
+
+                window.toggleExample = function(id) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const isExpanded = el.style.maxHeight !== '0px' && el.style.maxHeight !== '';
+                    if (isExpanded) {
+                        el.style.maxHeight = '0px';
+                        el.style.padding = '0';
+                        el.style.border = 'none';
+                        el.style.marginTop = '0';
+                        const btn = el.parentElement.querySelector('.doc-example-toggle');
+                        if (btn) btn.textContent = '📖 Show Example';
+                    } else {
+                        el.style.maxHeight = '300px';
+                        el.style.padding = '10px 14px';
+                        el.style.border = '1px solid var(--border-color)';
+                        el.style.marginTop = '8px';
+                        const btn = el.parentElement.querySelector('.doc-example-toggle');
+                        if (btn) btn.textContent = '📕 Hide Example';
+                    }
+                };
+            }
+
+
+            // ============================================================
+            // RENDER SECRET DOCS
+            // ============================================================
+
+            function renderSecretDocs(query) {
+                let filtered = SECRET_DOCS;
+                if (query && query !== 'lol') {
+                    filtered = SECRET_DOCS.filter(doc =>
+                        doc.name.toLowerCase().includes(query) ||
+                        doc.description.toLowerCase().includes(query) ||
+                        doc.category.toLowerCase().includes(query)
+                    );
+                }
+
+                docCount.textContent = filtered.length;
+
+                if (filtered.length === 0) {
+                    docsGrid.innerHTML = `
+                        <div class="no-docs-found">
+                            <span class="big-emoji">🤣</span>
+                            <h3 style="color:var(--text-primary);margin-bottom:8px;">No secret docs found</h3>
+                            <p style="color:var(--text-secondary);">Try a different search term, or type "lol" to go back</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                docsGrid.innerHTML = filtered.map((doc) => {
+                    let paramsHtml = '';
+                    if (doc.params && doc.params.length > 0) {
+                        paramsHtml = doc.params.map(p =>
+                            `<div class="detail-row">
+                                <span class="label">${p.name}</span>
+                                <span class="value"><span style="color:var(--matcha-light);">${p.type}</span> — ${p.description}</span>
+                            </div>`
+                        ).join('');
+                    } else {
+                        paramsHtml = `<div class="detail-row"><span class="label">Params</span><span class="value">None</span></div>`;
+                    }
+
+                    const returnsHtml = doc.returns ?
+                        `<div class="detail-row"><span class="label">Returns</span><span class="value">${doc.returns}</span></div>` :
+                        '';
+
+                    const exampleId = 'secret-example-' + doc.name.replace(/[^a-zA-Z0-9]/g, '');
+                    const exampleHtml = doc.example ?
+                        `
+                        <button class="doc-example-toggle" onclick="toggleExample('${exampleId}')">📖 Show Example</button>
+                        <div class="doc-example" id="${exampleId}" style="max-height:0;padding:0;overflow:hidden;border:none;margin-top:4px;">
+                            <code>${escapeHtml(doc.example)}</code>
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="doc-card secret">
+                            <div class="doc-name">${escapeHtml(doc.name)}</div>
+                            ${doc.signature ? `<div class="doc-signature">${escapeHtml(doc.signature)}</div>` : ''}
+                            <div class="doc-category">${escapeHtml(doc.category)}</div>
+                            <div class="doc-desc">${escapeHtml(doc.description)}</div>
+                            <div class="doc-details">
+                                ${paramsHtml}
+                                ${returnsHtml}
+                            </div>
+                            ${exampleHtml}
+                        </div>
+                    `;
+                }).join('');
+
+                window.toggleExample = function(id) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const isExpanded = el.style.maxHeight !== '0px' && el.style.maxHeight !== '';
+                    if (isExpanded) {
+                        el.style.maxHeight = '0px';
+                        el.style.padding = '0';
+                        el.style.border = 'none';
+                        el.style.marginTop = '0';
+                        const btn = el.parentElement.querySelector('.doc-example-toggle');
+                        if (btn) btn.textContent = '📖 Show Example';
+                    } else {
+                        el.style.maxHeight = '300px';
+                        el.style.padding = '10px 14px';
+                        el.style.border = '1px solid var(--border-color)';
+                        el.style.marginTop = '8px';
+                        const btn = el.parentElement.querySelector('.doc-example-toggle');
+                        if (btn) btn.textContent = '📕 Hide Example';
+                    }
+                };
+            }
+
+
+            // ============================================================
+            // UTILITY
+            // ============================================================
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+
+            // ============================================================
+            // HAMBURGER
+            // ============================================================
+
+            function initHamburger() {
+                if (!hamburger || !navLinks) return;
+                hamburger.addEventListener('click', () => {
+                    const isOpen = navLinks.classList.toggle('open');
+                    hamburger.classList.toggle('active');
+                    hamburger.setAttribute('aria-expanded', isOpen);
+                });
+
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navLinks.classList.remove('open');
+                        hamburger.classList.remove('active');
+                        hamburger.setAttribute('aria-expanded', 'false');
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.navbar') && navLinks.classList.contains('open')) {
+                        navLinks.classList.remove('open');
+                        hamburger.classList.remove('active');
+                        hamburger.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+
+
+            // ============================================================
+            // DOCS SEARCH
+            // ============================================================
+
+            function initDocsSearch() {
+                let searchTimeout;
+                docsSearch.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        renderDocs(docsSearch.value);
+                    }, 200);
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        docsSearch.focus();
+                        docsSearch.select();
+                    }
+                    if (e.key === 'Escape' && document.activeElement === docsSearch) {
+                        docsSearch.value = '';
+                        secretDocsActive = false;
+                        renderDocs('');
+                        docsSearch.blur();
+                        showToast('🔍 Search cleared');
+                    }
+                });
+            }
+
+
+            // ============================================================
+            // ANTI-INSPECT (optional)
+            // ============================================================
+
+            function initAntiInspect() {
+                document.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    showToast('🚫 Nice try, inspector!');
+                    return false;
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'F12') {
+                        e.preventDefault();
+                        showToast('🚫 F12 is disabled, inspector!');
+                        return false;
+                    }
+                    if ((e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey) && (e.key === 'i' || e.key === 'I')) {
+                        e.preventDefault();
+                        showToast('🚫 Dev tools are locked, inspector!');
+                        return false;
+                    }
+                    if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+                        e.preventDefault();
+                        showToast('🚫 Source viewer is disabled!');
+                        return false;
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'j' || e.key === 'J')) {
+                        e.preventDefault();
+                        showToast('🚫 Console is locked!');
+                        return false;
+                    }
+                    return true;
+                });
+            }
+
+
+            // ============================================================
+            // INIT
+            // ============================================================
+
+            initHamburger();
+            initDocsSearch();
+            initAntiInspect();
+            renderDocs();
+
+            console.log('📖 UI.lua Documentation loaded —', DOCS_DATA.length, 'functions.');
+            console.log('🤣 Secret docs: type "lol" in the search bar!');
+
+        })();
+    </script>
+
+</body>
+</html>
