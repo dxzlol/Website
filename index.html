@@ -55,6 +55,7 @@
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* ============================================================
@@ -366,6 +367,24 @@
             gap: 14px;
         }
 
+        /* --- Rotating plus button --- */
+        .btn-icon-rotate {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+        .btn-icon-rotate .icon-plus {
+            display: inline-block;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 300;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+        .btn-icon-rotate.rotated .icon-plus {
+            transform: rotate(90deg);
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -403,18 +422,14 @@
         }
 
         /* ============================================================
-                   TERMINAL
+                   TERMINAL WINDOW (draggable + glow)
                    ============================================================ */
-        .hero-visual {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: fadeUp 0.9s ease-out 0.2s both;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         .terminal-box {
+            position: relative;
+            transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), max-height 0.4s ease;
+            will-change: transform;
+            cursor: default;
+            touch-action: none;
             width: 100%;
             max-width: 520px;
             background: var(--bg-secondary);
@@ -422,35 +437,140 @@
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+            transform: translate(0, 0);
         }
+        .terminal-box.dragging {
+            transition: none !important;
+            cursor: grab;
+            z-index: 50;
+        }
+        .terminal-box.snapping {
+            transition: transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+            cursor: default;
+        }
+        .terminal-box.snapping .terminal-header {
+            cursor: default;
+        }
+
+        .terminal-box.minimized {
+            max-height: 48px;
+            overflow: hidden;
+            border-radius: var(--radius);
+        }
+        .terminal-box.minimized .terminal-body {
+            display: none;
+        }
+
         .terminal-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 12px 18px;
+            padding: 8px 14px;
             background: rgba(255, 255, 255, 0.03);
             border-bottom: 1px solid var(--border-color);
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            gap: 8px;
+            height: 48px;
         }
-        .terminal-dot {
-            width: 12px;
-            height: 12px;
+        .terminal-box.dragging .terminal-header {
+            cursor: grabbing;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 7px;
+            flex-shrink: 0;
+            margin-right: 8px;
+        }
+        .window-btn {
+            width: 13px;
+            height: 13px;
             border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0px;
+            color: transparent;
+            position: relative;
+            flex-shrink: 0;
         }
-        .terminal-dot.red {
+        .window-btn:hover {
+            transform: scale(1.15);
+        }
+        .window-btn.close {
             background: #ff5f56;
         }
-        .terminal-dot.yellow {
+        .window-btn.close:hover {
+            background: #ff3b30;
+        }
+        .window-btn.close::after {
+            content: '✕';
+            font-size: 9px;
+            color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.2s;
+            line-height: 1;
+            font-weight: 600;
+        }
+        .window-btn.close:hover::after {
+            opacity: 1;
+        }
+
+        .window-btn.minimize {
             background: #ffbd2e;
         }
-        .terminal-dot.green {
+        .window-btn.minimize:hover {
+            background: #ff9f0a;
+        }
+        .window-btn.minimize::after {
+            content: '─';
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.2s;
+            line-height: 1;
+            font-weight: 300;
+            margin-top: -2px;
+        }
+        .window-btn.minimize:hover::after {
+            opacity: 1;
+        }
+
+        .window-btn.maximize {
             background: #27c93f;
         }
+        .window-btn.maximize:hover {
+            background: #1db934;
+        }
+        .window-btn.maximize::after {
+            content: '⛶';
+            font-size: 9px;
+            color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.2s;
+            line-height: 1;
+            font-weight: 400;
+        }
+        .window-btn.maximize:hover::after {
+            opacity: 1;
+        }
+
         .terminal-title {
-            margin-left: 8px;
             font-family: var(--font-mono);
             font-size: 0.75rem;
             color: var(--text-muted);
             letter-spacing: 0.04em;
+            flex: 1;
+            text-align: center;
+            margin: 0 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .terminal-body {
@@ -459,6 +579,7 @@
             font-size: 0.85rem;
             line-height: 1.8;
             min-height: 200px;
+            transition: opacity 0.3s ease;
         }
         .terminal-body .line {
             opacity: 0;
@@ -500,6 +621,41 @@
         }
         .terminal-body .highlight-out {
             color: var(--pink);
+        }
+
+        /* --- FORCE VISIBILITY FOR .LUA LINES --- */
+        .terminal-body .line[data-lua="true"] {
+            opacity: 1 !important;
+            animation: typeIn 0.5s ease forwards, glowFlow 2.5s ease-in-out infinite alternate;
+        }
+
+        /* Glowing, flowing effect for .lua lines – only on hover */
+        .terminal-box:hover .line[data-lua="true"] {
+            animation: typeIn 0.5s ease forwards, glowFlow 2.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowFlow {
+            0% {
+                text-shadow: 0 0 8px rgba(76, 175, 80, 0.6), 0 0 16px rgba(76, 175, 80, 0.3);
+                color: var(--matcha-light);
+            }
+            33% {
+                text-shadow: 0 0 12px rgba(244, 143, 177, 0.8), 0 0 24px rgba(244, 143, 177, 0.4);
+                color: var(--pink);
+            }
+            66% {
+                text-shadow: 0 0 12px rgba(88, 166, 255, 0.8), 0 0 24px rgba(88, 166, 255, 0.4);
+                color: #58a6ff;
+            }
+            100% {
+                text-shadow: 0 0 8px rgba(76, 175, 80, 0.6), 0 0 16px rgba(76, 175, 80, 0.3);
+                color: var(--matcha-light);
+            }
+        }
+
+        /* Glowing effect for script card code previews on hover */
+        .script-card:hover .code-preview-wrapper pre code {
+            animation: glowFlow 2.5s ease-in-out infinite alternate;
         }
 
         /* ============================================================
@@ -719,6 +875,202 @@
         }
 
         /* ============================================================
+                   DOCS SECTION (searchable)
+                   ============================================================ */
+        .docs-section {
+            position: relative;
+            z-index: 1;
+            padding: 80px 0 100px;
+            background: var(--bg-secondary);
+        }
+
+        .docs-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .docs-search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+            max-width: 500px;
+        }
+        .docs-search-wrapper input {
+            width: 100%;
+            padding: 10px 16px 10px 40px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            transition: var(--transition);
+            outline: none;
+        }
+        .docs-search-wrapper input:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px var(--pink-glow);
+        }
+        .docs-search-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+        .docs-search-wrapper .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            font-size: 1.1rem;
+        }
+        .docs-search-wrapper .shortcut-hint {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            font-family: var(--font-mono);
+            pointer-events: none;
+        }
+
+        .docs-stats {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .doc-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            transition: var(--transition);
+            position: relative;
+        }
+        .doc-card:hover {
+            border-color: rgba(244, 143, 177, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .doc-card .doc-name {
+            font-family: var(--font-mono);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--pink);
+            margin-bottom: 2px;
+        }
+        .doc-card .doc-signature {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--matcha-light);
+            margin-bottom: 8px;
+        }
+        .doc-card .doc-desc {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+        .doc-card .doc-category {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            padding: 2px 12px;
+            border-radius: 12px;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--matcha-light);
+            border: 1px solid rgba(76, 175, 80, 0.15);
+            margin-bottom: 12px;
+        }
+        .doc-card .doc-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+        .doc-card .doc-details .detail-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .doc-card .doc-details .detail-row .label {
+            color: var(--text-muted);
+            min-width: 70px;
+            flex-shrink: 0;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+        .doc-card .doc-details .detail-row .value {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        .doc-card .doc-example {
+            margin-top: 12px;
+            background: var(--bg-primary);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 80px;
+            overflow-y: auto;
+            transition: max-height 0.3s ease;
+        }
+        .doc-card .doc-example.expanded {
+            max-height: 300px;
+        }
+        .doc-card .doc-example-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            padding: 4px 0;
+            transition: var(--transition);
+        }
+        .doc-card .doc-example-toggle:hover {
+            color: var(--pink);
+        }
+
+        .doc-card.hidden {
+            display: none;
+        }
+
+        .no-docs-found {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .no-docs-found .big-emoji {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        /* ============================================================
                    README SECTION
                    ============================================================ */
         .readme-section {
@@ -907,6 +1259,145 @@
         }
 
         /* ============================================================
+                   SECRET THEME OVERRIDES
+                   ============================================================ */
+        body.secret-theme {
+            background: #ffeb3b !important;
+            color: #1a1a1a !important;
+        }
+
+        body.secret-theme .navbar {
+            background: rgba(255, 235, 59, 0.95) !important;
+            border-bottom-color: #d4a800 !important;
+        }
+
+        body.secret-theme .nav-logo,
+        body.secret-theme .nav-links a,
+        body.secret-theme .hero p,
+        body.secret-theme .section-sub,
+        body.secret-theme .card-desc,
+        body.secret-theme .card-footer,
+        body.secret-theme .footer .copy,
+        body.secret-theme .footer .socials a,
+        body.secret-theme .doc-desc,
+        body.secret-theme .doc-details,
+        body.secret-theme .docs-stats,
+        body.secret-theme .doc-card .doc-name,
+        body.secret-theme .doc-card .doc-signature,
+        body.secret-theme .doc-card .doc-details .detail-row .value,
+        body.secret-theme .no-docs-found,
+        body.secret-theme .readme-box h1,
+        body.secret-theme .readme-box h2,
+        body.secret-theme .readme-box h3,
+        body.secret-theme .readme-box p,
+        body.secret-theme .readme-box code,
+        body.secret-theme .section-title .highlight {
+            color: #1a1a1a !important;
+            -webkit-text-fill-color: #1a1a1a !important;
+        }
+
+        body.secret-theme .section-label,
+        body.secret-theme .hero-badge,
+        body.secret-theme .btn-outline,
+        body.secret-theme .btn-primary {
+            background: rgba(0, 0, 0, 0.12) !important;
+            border-color: #1a1a1a !important;
+            color: #1a1a1a !important;
+        }
+
+        body.secret-theme .btn-primary {
+            background: #1a1a1a !important;
+            color: #ffeb3b !important;
+        }
+
+        body.secret-theme .btn-primary:hover {
+            background: #333 !important;
+        }
+
+        body.secret-theme .script-card,
+        body.secret-theme .readme-box,
+        body.secret-theme .doc-card,
+        body.secret-theme .terminal-box {
+            background: rgba(255, 255, 255, 0.92) !important;
+            border-color: #1a1a1a !important;
+        }
+
+        body.secret-theme .code-preview-wrapper,
+        body.secret-theme .doc-example {
+            background: #fff !important;
+            border-color: #1a1a1a !important;
+        }
+
+        body.secret-theme .code-preview-wrapper pre code {
+            color: #1a1a1a !important;
+        }
+
+        body.secret-theme .docs-search-wrapper input {
+            background: #fff !important;
+            color: #1a1a1a !important;
+            border-color: #1a1a1a !important;
+        }
+        body.secret-theme .docs-search-wrapper input::placeholder {
+            color: #666 !important;
+        }
+
+        body.secret-theme .watermark {
+            opacity: 0.25 !important;
+            filter: invert(1) !important;
+        }
+
+        body.secret-theme .doc-card .doc-category {
+            background: rgba(0, 0, 0, 0.08) !important;
+            color: #1a1a1a !important;
+            border-color: rgba(0, 0, 0, 0.15) !important;
+        }
+
+        body.secret-theme .code-actions .btn {
+            color: #1a1a1a !important;
+            border-color: #1a1a1a !important;
+        }
+        body.secret-theme .code-actions .btn:hover {
+            background: rgba(0, 0, 0, 0.1) !important;
+        }
+        body.secret-theme .code-actions .btn-copy {
+            background: #1a1a1a !important;
+            color: #ffeb3b !important;
+            border-color: #1a1a1a !important;
+        }
+        body.secret-theme .code-actions .btn-copy:hover {
+            background: #333 !important;
+        }
+
+        body.secret-theme .doc-example-toggle {
+            color: #1a1a1a !important;
+        }
+        body.secret-theme .doc-example-toggle:hover {
+            color: var(--pink-dark) !important;
+        }
+
+        /* Secret emoji container */
+        .secret-emoji-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .secret-emoji {
+            position: absolute;
+            font-size: 40px;
+            user-select: none;
+            pointer-events: none;
+            will-change: transform;
+            transition: none;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* ============================================================
                    RESPONSIVE
                    ============================================================ */
         @media (max-width: 992px) {
@@ -922,7 +1413,8 @@
             .hero-actions {
                 justify-content: center;
             }
-            .scripts-grid {
+            .scripts-grid,
+            .docs-grid {
                 grid-template-columns: 1fr;
             }
             .watermark {
@@ -930,6 +1422,13 @@
                 height: 120px;
                 bottom: 10px;
                 right: 10px;
+            }
+            .docs-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .docs-search-wrapper {
+                max-width: 100%;
             }
         }
 
@@ -969,7 +1468,8 @@
             .readme-box {
                 padding: 20px;
             }
-            .scripts-grid {
+            .scripts-grid,
+            .docs-grid {
                 grid-template-columns: 1fr;
             }
             .code-preview-wrapper pre {
@@ -983,18 +1483,26 @@
                 right: 6px;
                 opacity: 0.04;
             }
+            .docs-search-wrapper .shortcut-hint {
+                display: none;
+            }
         }
 
         @media (max-width: 480px) {
             .hero h1 {
                 font-size: 2.2rem;
             }
-            .script-card {
+            .script-card,
+            .doc-card {
                 padding: 18px 16px;
             }
             .code-actions {
                 flex-direction: column;
                 align-items: stretch;
+            }
+            .docs-search-wrapper input {
+                font-size: 0.85rem;
+                padding: 8px 12px 8px 36px;
             }
         }
     </style>
@@ -1033,6 +1541,7 @@
 
             <ul class="nav-links" id="navLinks" role="menubar">
                 <li role="none"><a href="#scripts" role="menuitem">Scripts</a></li>
+                <li role="none"><a href="#docs" role="menuitem">Docs</a></li>
                 <li role="none"><a href="#readme" role="menuitem">README</a></li>
                 <li role="none">
                     <a href="https://github.com/dxzlol/67" target="_blank" rel="noopener noreferrer" class="nav-gh-btn" role="menuitem">
@@ -1070,8 +1579,8 @@
                     Built with <span style="color:var(--pink);">❤</span> and a lot of green tea.
                 </p>
                 <div class="hero-actions">
-                    <a href="#scripts" class="btn btn-primary">
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v12M3 9h12"/></svg>
+                    <a href="#scripts" class="btn btn-primary btn-icon-rotate" id="exploreBtn">
+                        <span class="icon-plus">+</span>
                         Explore Scripts
                     </a>
                     <a href="https://github.com/dxzlol/67" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
@@ -1082,11 +1591,14 @@
             </div>
 
             <div class="hero-visual">
-                <div class="terminal-box">
-                    <div class="terminal-header">
-                        <span class="terminal-dot red"></span>
-                        <span class="terminal-dot yellow"></span>
-                        <span class="terminal-dot green"></span>
+                <!-- Draggable terminal window -->
+                <div class="terminal-box" id="terminalBox">
+                    <div class="terminal-header" id="terminalHeader">
+                        <div class="window-controls">
+                            <button class="window-btn close" id="terminalClose" title="Close"></button>
+                            <button class="window-btn minimize" id="terminalMinimize" title="Minimize"></button>
+                            <button class="window-btn maximize" id="terminalMaximize" title="Maximize (disabled)"></button>
+                        </div>
                         <span class="terminal-title">~/67/matcha (lua)</span>
                     </div>
                     <div class="terminal-body">
@@ -1095,11 +1607,12 @@
                         <div class="line"><span class="output">remote: Enumerating objects: <span class="highlight-out">47</span>, done.</span></div>
                         <div class="line"><span class="prompt">$</span> <span class="cmd">cd 67/scripts</span></div>
                         <div class="line"><span class="prompt">$</span> <span class="cmd">ls -la</span></div>
-                        <div class="line"><span class="output">├── <span class="highlight-out">UI.lua</span>              · WaifuUI + HomesickUI</span></div>
-                        <div class="line"><span class="output">├── <span class="highlight-out">survivehomelander.lua</span>  · ESP + Homelander detection</span></div>
+                        <div class="line" data-lua="true"><span class="output">├── <span class="highlight-out">UI.lua</span>              · WaifuUI + HomesickUI</span></div>
+                        <div class="line" data-lua="true"><span class="output">├── <span class="highlight-out">survivehomelander.lua</span>  · ESP + Homelander detection</span></div>
                         <div class="line"><span class="output">└── <span class="highlight-out">README.md</span>            · project docs</span></div>
                     </div>
                 </div>
+                <!-- Profile picture (small, below terminal) -->
                 <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
                     <img src="https://github.com/dxzlol.png" style="width:48px;height:48px;border-radius:50%;border:2px solid var(--pink);" alt="dxzlol" />
                     <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-secondary);">dxzlol</span>
@@ -1140,6 +1653,45 @@
                 <!-- Injected by JavaScript -->
                 <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
                     Loading scripts from GitHub...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================
+    DOCS SECTION (searchable)
+    ============================================================ -->
+    <section class="docs-section" id="docs">
+        <div class="container">
+            <div class="reveal">
+                <div class="docs-header">
+                    <div>
+                        <span class="section-label">
+                            <img class="matcha-icon-small" src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
+                            📖 API Reference
+                        </span>
+                        <h2 class="section-title">
+                            UI.lua <span class="highlight">Documentation</span>
+                        </h2>
+                        <p class="section-sub">
+                            Complete reference for the merged WaifuUI + HomesickUI library.
+                        </p>
+                    </div>
+                    <div class="docs-stats" id="docsStats">
+                        <span id="docCount">0</span> functions
+                    </div>
+                </div>
+
+                <!-- Search bar -->
+                <div class="docs-search-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="docsSearch" placeholder="Search functions, descriptions, categories..." />
+                    <span class="shortcut-hint">⌘K</span>
+                </div>
+
+                <!-- Docs grid -->
+                <div class="docs-grid" id="docsGrid">
+                    <!-- Injected by JavaScript -->
                 </div>
             </div>
         </div>
@@ -1228,19 +1780,273 @@
 
 
             // ============================================================
+            // DOCS DATA (searchable wiki for UI.lua)
+            // ============================================================
+
+            const DOCS_DATA = [{
+                name: 'UI:CreateWindow',
+                signature: 'UI:CreateWindow(title, size)',
+                description: 'Creates a new window with the given title and size. Returns a window object with methods for adding UI elements.',
+                category: 'Window',
+                params: [
+                    { name: 'title', type: 'string', description: 'The window title displayed in the title bar.' },
+                    { name: 'size', type: 'table', description: 'A table with width and height: {width, height}.' }
+                ],
+                returns: 'Window object with methods: CreateButton, CreateLabel, CreateToggle, etc.',
+                example: 'local win = UI:CreateWindow("My Script", {400, 300})'
+            }, {
+                name: 'Window:CreateButton',
+                signature: 'Window:CreateButton(text, callback)',
+                description: 'Adds a clickable button to the window. The callback function is executed when the button is clicked.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'The label displayed on the button.' },
+                    { name: 'callback', type: 'function', description: 'Function called when the button is clicked.' }
+                ],
+                returns: 'Button object (can be used to update the button later).',
+                example: 'win:CreateButton("Click me", function() print("Hello!") end)'
+            }, {
+                name: 'Window:CreateLabel',
+                signature: 'Window:CreateLabel(text)',
+                description: 'Adds a static text label to the window.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'The label text to display.' }
+                ],
+                returns: 'Label object.',
+                example: 'win:CreateLabel("Welcome to the script!")'
+            }, {
+                name: 'Window:CreateToggle',
+                signature: 'Window:CreateToggle(text, default, callback)',
+                description: 'Adds a toggle switch that can be turned on/off.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'Label next to the toggle.' },
+                    { name: 'default', type: 'boolean', description: 'Initial state (true = on).' },
+                    { name: 'callback', type: 'function', description: 'Called when the toggle state changes. Receives the new state (boolean).' }
+                ],
+                returns: 'Toggle object.',
+                example: 'win:CreateToggle("Enable ESP", true, function(state) print("ESP:", state) end)'
+            }, {
+                name: 'Window:CreateSlider',
+                signature: 'Window:CreateSlider(text, min, max, default, callback)',
+                description: 'Adds a slider for numeric input within a range.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'Label for the slider.' },
+                    { name: 'min', type: 'number', description: 'Minimum value.' },
+                    { name: 'max', type: 'number', description: 'Maximum value.' },
+                    { name: 'default', type: 'number', description: 'Initial value.' },
+                    { name: 'callback', type: 'function', description: 'Called when the slider changes. Receives the new value.' }
+                ],
+                returns: 'Slider object.',
+                example: 'win:CreateSlider("Speed", 0, 100, 50, function(val) print("Speed:", val) end)'
+            }, {
+                name: 'Window:CreateDropdown',
+                signature: 'Window:CreateDropdown(text, options, default, callback)',
+                description: 'Adds a dropdown menu with selectable options.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'text', type: 'string', description: 'Label for the dropdown.' },
+                    { name: 'options', type: 'table', description: 'Array of option strings.' },
+                    { name: 'default', type: 'string', description: 'Default selected option (must match an option).' },
+                    { name: 'callback', type: 'function', description: 'Called when an option is selected. Receives the selected option string.' }
+                ],
+                returns: 'Dropdown object.',
+                example: 'win:CreateDropdown("Mode", {"Auto", "Manual", "Hybrid"}, "Auto", function(opt) print("Mode:", opt) end)'
+            }, {
+                name: 'Window:CreateTextInput',
+                signature: 'Window:CreateTextInput(placeholder, callback)',
+                description: 'Adds a text input field where users can type custom values.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'placeholder', type: 'string', description: 'Placeholder text shown when empty.' },
+                    { name: 'callback', type: 'function', description: 'Called when the user submits text. Receives the entered string.' }
+                ],
+                returns: 'TextInput object.',
+                example: 'win:CreateTextInput("Enter name...", function(text) print("Name:", text) end)'
+            }, {
+                name: 'Window:CreateTab',
+                signature: 'Window:CreateTab(name)',
+                description: 'Creates a new tab for organizing UI elements in a tabbed interface.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'name', type: 'string', description: 'The tab name displayed in the header.' }
+                ],
+                returns: 'Tab object (can be used to add elements to this tab).',
+                example: 'local settingsTab = win:CreateTab("Settings")'
+            }, {
+                name: 'UI:GetVersion',
+                signature: 'UI:GetVersion()',
+                description: 'Returns the current version of the UI library.',
+                category: 'Utility',
+                params: [],
+                returns: 'Version string (e.g., "2.1.0").',
+                example: 'print(UI:GetVersion())'
+            }, {
+                name: 'UI:SetTheme',
+                signature: 'UI:SetTheme(theme)',
+                description: 'Sets the color theme of the UI. Built‑in themes: "matcha", "pink", "dark", "light".',
+                category: 'Utility',
+                params: [
+                    { name: 'theme', type: 'string', description: 'Theme name: "matcha", "pink", "dark", or "light".' }
+                ],
+                returns: 'nil',
+                example: 'UI:SetTheme("pink")'
+            }, {
+                name: 'Window:Destroy',
+                signature: 'Window:Destroy()',
+                description: 'Closes and removes the window from the screen. All children are destroyed automatically.',
+                category: 'Window Methods',
+                params: [],
+                returns: 'nil',
+                example: 'win:Destroy()'
+            }, {
+                name: 'Window:SetSize',
+                signature: 'Window:SetSize(width, height)',
+                description: 'Resizes the window to the specified dimensions.',
+                category: 'Window Methods',
+                params: [
+                    { name: 'width', type: 'number', description: 'New width in pixels.' },
+                    { name: 'height', type: 'number', description: 'New height in pixels.' }
+                ],
+                returns: 'nil',
+                example: 'win:SetSize(500, 400)'
+            }];
+
+            // ============================================================
+            // SECRET DOCS DATA (Easter egg)
+            // ============================================================
+
+            const SECRET_DOCS = [{
+                name: 'How to exit Vim',
+                signature: ':wq (impossible)',
+                description: 'You don\'t. Vim exits you. The only winning move is not to play.',
+                category: '🧙‍♂️ Life Hacks',
+                params: [],
+                returns: 'Despair.',
+                example: 'sudo rm -rf / --no-preserve-root'
+            }, {
+                name: 'How to touch grass',
+                signature: 'grass.touch()',
+                description: 'Step 1: Close this tab. Step 2: Go outside. Step 3: Touch the green stuff. It\'s not that hard, bro.',
+                category: '🌿 Wellness',
+                params: [],
+                returns: 'Grass (it\'s soft, trust me)',
+                example: 'while true do touch(grass) end'
+            }, {
+                name: 'The meaning of life',
+                signature: '42',
+                description: '42, obviously. Did you even read the book? Also, it\'s the answer to everything.',
+                category: '🤯 Philosophy',
+                params: [],
+                returns: 'The answer to life, the universe, and everything.',
+                example: 'print("The answer is", 42)'
+            }, {
+                name: 'How to read the docs',
+                signature: 'read(docs)',
+                description: 'You\'re already doing it. Congrats! You\'re literally reading the docs right now. Pat yourself on the back.',
+                category: '📖 Meta',
+                params: [],
+                returns: 'Knowledge (and a sense of pride)',
+                example: 'while true do read(self) end'
+            }, {
+                name: 'How to fix your code',
+                signature: 'fix(code)',
+                description: 'Have you tried turning it off and on again? If that doesn\'t work, blame the compiler. It\'s always the compiler\'s fault.',
+                category: '🔧 Debugging',
+                params: [],
+                returns: 'A false sense of security.',
+                example: 'function fix() print("It works on my machine") end'
+            }, {
+                name: 'How to get a girlfriend',
+                signature: 'dating.get()',
+                description: 'Ask dxzlol, they have rizz. Or just write a dating sim in Lua and hope for the best.',
+                category: '❤️ Relationships',
+                params: [],
+                returns: 'Probably loneliness, but we believe in you.',
+                example: 'local gf = getGirlfriend() -- returns nil 90% of the time'
+            }, {
+                name: 'Why is the UI pink?',
+                signature: 'UI:GetColor()',
+                description: 'Because matcha needed a glow-up. Also, pink is objectively the best color. Don\'t @ me.',
+                category: '🎨 Design',
+                params: [],
+                returns: 'Aesthetic satisfaction.',
+                example: 'UI:SetTheme("pink") -- you know you want to'
+            }, {
+                name: 'How to stop the lol theme',
+                signature: 'lol:disable()',
+                description: 'Type "lol" anywhere. Wait, you already did that. Now you\'re stuck in an infinite loop. Enjoy the yellow.',
+                category: '🌀 Paradox',
+                params: [],
+                returns: 'More yellow.',
+                example: 'while true do print("lol") end -- you\'re welcome'
+            }, {
+                name: 'How to make a sandwich',
+                signature: 'sandwich.make(bread, filling)',
+                description: 'Step 1: Get bread. Step 2: Put stuff on it. Step 3: Eat. You\'re welcome. This is the most important documentation.',
+                category: '🥪 Culinary Arts',
+                params: [
+                    { name: 'bread', type: 'string', description: 'Type of bread (white, whole wheat, sourdough, etc.).' },
+                    { name: 'filling', type: 'table', description: 'Array of ingredients (cheese, meat, veggies, etc.).' }
+                ],
+                returns: 'A delicious sandwich (or a mess, depends on your skills).',
+                example: 'sandwich.make("sourdough", {"cheese", "ham", "lettuce"})'
+            }, {
+                name: 'How to talk to women',
+                signature: 'social.interact(woman)',
+                description: 'Step 1: Be confident. Step 2: Say "hello". Step 3: Run away. It works 10% of the time, every time.',
+                category: '💀 Social Skills',
+                params: [],
+                returns: 'Rejection, but you\'ll get used to it.',
+                example: 'social.interact(woman) -- error: attempt to call nil value'
+            }, {
+                name: 'The secret to happiness',
+                signature: 'happiness.get()',
+                description: 'It\'s not money. It\'s not fame. It\'s... actually, it\'s a clean codebase. A clean codebase is the secret to happiness.',
+                category: '🌟 Inspiration',
+                params: [],
+                returns: 'A warm feeling in your heart (and a working linter).',
+                example: 'while true do cleanCodebase() end'
+            }, {
+                name: 'How to become a wizard',
+                signature: 'wizard.become()',
+                description: 'Step 1: Write a Lua script. Step 2: It works on the first try. Step 3: You are now a wizard. Congratulations!',
+                category: '🧙‍♂️ Arcane',
+                params: [],
+                returns: 'A pointy hat and a staff.',
+                example: 'wizard.become() -- requires 1000 hours of debugging'
+            }];
+
+
+            // ============================================================
             // DOM REFS
             // ============================================================
 
             const scriptsGrid = document.getElementById('scriptsGrid');
             const readmeContainer = document.getElementById('readmeContainer');
+            const docsGrid = document.getElementById('docsGrid');
+            const docsSearch = document.getElementById('docsSearch');
+            const docCount = document.getElementById('docCount');
             const navbar = document.getElementById('navbar');
             const hamburger = document.getElementById('hamburger');
             const navLinks = document.getElementById('navLinks');
             const canvas = document.getElementById('particles-canvas');
             const toast = document.getElementById('toast');
             const reloadBtn = document.getElementById('reloadScripts');
+            const exploreBtn = document.getElementById('exploreBtn');
+
+            const terminalBox = document.getElementById('terminalBox');
+            const terminalHeader = document.getElementById('terminalHeader');
+            const terminalClose = document.getElementById('terminalClose');
+            const terminalMinimize = document.getElementById('terminalMinimize');
+            const terminalMaximize = document.getElementById('terminalMaximize');
 
             let toastTimeout = null;
+            let secretDocsActive = false;
+            let lastSearchQuery = '';
+
 
             // ============================================================
             // TOAST
@@ -1253,6 +2059,225 @@
                 toastTimeout = setTimeout(() => {
                     toast.classList.remove('show');
                 }, 3000);
+            }
+
+
+            // ============================================================
+            // EXPLORE BUTTON
+            // ============================================================
+
+            function initExploreButton() {
+                if (!exploreBtn) return;
+                exploreBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    this.classList.add('rotated');
+                    const target = document.getElementById('scripts');
+                    if (target) {
+                        const navHeight = navbar.offsetHeight;
+                        const targetPos = target.getBoundingClientRect().top + window.scrollY - navHeight - 20;
+                        window.scrollTo({ top: targetPos, behavior: 'smooth' });
+                    }
+                    setTimeout(() => {
+                        this.classList.remove('rotated');
+                    }, 800);
+                });
+            }
+
+
+            // ============================================================
+            // RENDER DOCS
+            // ============================================================
+
+            function renderDocs(filter = '') {
+                const query = filter.toLowerCase().trim();
+                lastSearchQuery = query;
+
+                if (query === 'lol') {
+                    if (!secretDocsActive) {
+                        secretDocsActive = true;
+                        showToast('🤣 Secret docs unlocked! Type "lol" again to go back.');
+                    } else {
+                        secretDocsActive = false;
+                        showToast('🔙 Back to normal docs.');
+                        docsSearch.value = '';
+                        renderDocs('');
+                        return;
+                    }
+                }
+
+                if (secretDocsActive) {
+                    renderSecretDocs(query);
+                    return;
+                }
+
+                let filtered = DOCS_DATA;
+                if (query) {
+                    filtered = DOCS_DATA.filter(doc =>
+                        doc.name.toLowerCase().includes(query) ||
+                        doc.description.toLowerCase().includes(query) ||
+                        doc.category.toLowerCase().includes(query) ||
+                        (doc.signature && doc.signature.toLowerCase().includes(query))
+                    );
+                }
+
+                docCount.textContent = filtered.length;
+
+                if (filtered.length === 0) {
+                    docsGrid.innerHTML = `
+                        <div class="no-docs-found">
+                            <span class="big-emoji">🔍</span>
+                            <h3 style="color:var(--text-primary);margin-bottom:8px;">No matching functions found</h3>
+                            <p style="color:var(--text-secondary);">Try a different search term</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                docsGrid.innerHTML = filtered.map((doc) => {
+                    let paramsHtml = '';
+                    if (doc.params && doc.params.length > 0) {
+                        paramsHtml = doc.params.map(p =>
+                            `<div class="detail-row">
+                                <span class="label">${p.name}</span>
+                                <span class="value"><span style="color:var(--matcha-light);">${p.type}</span> — ${p.description}</span>
+                            </div>`
+                        ).join('');
+                    } else {
+                        paramsHtml = `<div class="detail-row"><span class="label">Params</span><span class="value">None</span></div>`;
+                    }
+
+                    const returnsHtml = doc.returns ?
+                        `<div class="detail-row"><span class="label">Returns</span><span class="value">${doc.returns}</span></div>` :
+                        '';
+
+                    const exampleId = 'example-' + doc.name.replace(/[^a-zA-Z0-9]/g, '');
+                    const exampleHtml = doc.example ?
+                        `
+                        <button class="doc-example-toggle" onclick="toggleExample('${exampleId}')">📖 Show Example</button>
+                        <div class="doc-example" id="${exampleId}" style="max-height:0;padding:0;overflow:hidden;border:none;margin-top:4px;">
+                            <code>${escapeHtml(doc.example)}</code>
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="doc-card reveal">
+                            <div class="doc-name">${escapeHtml(doc.name)}</div>
+                            ${doc.signature ? `<div class="doc-signature">${escapeHtml(doc.signature)}</div>` : ''}
+                            <div class="doc-category">${escapeHtml(doc.category)}</div>
+                            <div class="doc-desc">${escapeHtml(doc.description)}</div>
+                            <div class="doc-details">
+                                ${paramsHtml}
+                                ${returnsHtml}
+                            </div>
+                            ${exampleHtml}
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.doc-card.reveal').forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight) {
+                        el.classList.add('visible');
+                    }
+                });
+
+                window.toggleExample = function(id) {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    const isExpanded = el.style.maxHeight !== '0px' && el.style.maxHeight !== '';
+                    if (isExpanded) {
+                        el.style.maxHeight = '0px';
+                        el.style.padding = '0';
+                        el.style.border = 'none';
+                        el.style.marginTop = '0';
+                        const btn = el.parentElement.querySelector('.doc-example-toggle');
+                        if (btn) btn.textContent = '📖 Show Example';
+                    } else {
+                        el.style.maxHeight = '300px';
+                        el.style.padding = '10px 14px';
+                        el.style.border = '1px solid var(--border-color)';
+                        el.style.marginTop = '8px';
+                        const btn = el.parentElement.querySelector('.doc-example-toggle');
+                        if (btn) btn.textContent = '📕 Hide Example';
+                    }
+                };
+            }
+
+
+            // ============================================================
+            // RENDER SECRET DOCS
+            // ============================================================
+
+            function renderSecretDocs(query) {
+                let filtered = SECRET_DOCS;
+                if (query && query !== 'lol') {
+                    filtered = SECRET_DOCS.filter(doc =>
+                        doc.name.toLowerCase().includes(query) ||
+                        doc.description.toLowerCase().includes(query) ||
+                        doc.category.toLowerCase().includes(query)
+                    );
+                }
+
+                docCount.textContent = filtered.length;
+
+                if (filtered.length === 0) {
+                    docsGrid.innerHTML = `
+                        <div class="no-docs-found">
+                            <span class="big-emoji">🤣</span>
+                            <h3 style="color:var(--text-primary);margin-bottom:8px;">No secret docs found</h3>
+                            <p style="color:var(--text-secondary);">Try a different search term, or type "lol" to go back</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                docsGrid.innerHTML = filtered.map((doc) => {
+                    let paramsHtml = '';
+                    if (doc.params && doc.params.length > 0) {
+                        paramsHtml = doc.params.map(p =>
+                            `<div class="detail-row">
+                                <span class="label">${p.name}</span>
+                                <span class="value"><span style="color:var(--matcha-light);">${p.type}</span> — ${p.description}</span>
+                            </div>`
+                        ).join('');
+                    } else {
+                        paramsHtml = `<div class="detail-row"><span class="label">Params</span><span class="value">None</span></div>`;
+                    }
+
+                    const returnsHtml = doc.returns ?
+                        `<div class="detail-row"><span class="label">Returns</span><span class="value">${doc.returns}</span></div>` :
+                        '';
+
+                    const exampleId = 'secret-example-' + doc.name.replace(/[^a-zA-Z0-9]/g, '');
+                    const exampleHtml = doc.example ?
+                        `
+                        <button class="doc-example-toggle" onclick="toggleExample('${exampleId}')">📖 Show Example</button>
+                        <div class="doc-example" id="${exampleId}" style="max-height:0;padding:0;overflow:hidden;border:none;margin-top:4px;">
+                            <code>${escapeHtml(doc.example)}</code>
+                        </div>
+                    ` : '';
+
+                    return `
+                        <div class="doc-card reveal" style="border-color: var(--pink);">
+                            <div class="doc-name" style="color: var(--pink-dark);">${escapeHtml(doc.name)}</div>
+                            ${doc.signature ? `<div class="doc-signature">${escapeHtml(doc.signature)}</div>` : ''}
+                            <div class="doc-category" style="background: rgba(244,143,177,0.15); color: var(--pink-dark);">${escapeHtml(doc.category)}</div>
+                            <div class="doc-desc">${escapeHtml(doc.description)}</div>
+                            <div class="doc-details">
+                                ${paramsHtml}
+                                ${returnsHtml}
+                            </div>
+                            ${exampleHtml}
+                        </div>
+                    `;
+                }).join('');
+
+                document.querySelectorAll('.doc-card.reveal').forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight) {
+                        el.classList.add('visible');
+                    }
+                });
             }
 
 
@@ -1276,30 +2301,23 @@
                                 const content = await resp.text();
                                 const lines = content.split('\n');
                                 const totalLines = lines.length;
-                                // Take first 20 lines, but if the file is shorter, take all.
                                 const previewLines = lines.slice(0, 20).join('\n');
-                                // If preview is empty after trimming, show a placeholder with the first few characters of the file
                                 let preview = previewLines.trim();
                                 if (!preview) {
-                                    // The file may have leading spaces or empty lines, try to show something
                                     const firstChars = content.substring(0, 200);
                                     preview = firstChars ? `-- (first 200 chars) \n${firstChars}` : '-- (file is empty)';
                                 }
-                                console.log(`✅ Loaded ${file.name}: ${totalLines} lines, preview length: ${preview.length}`);
                                 return { ...file, content, preview, totalLines, error: null };
                             } catch (err) {
-                                console.error(`❌ Failed to load ${file.name}:`, err);
                                 return { ...file, content: null, preview: `⚠️ Failed to load: ${err.message}`, totalLines: 0,
                                     error: err.message };
                             }
                         })
                     );
 
-                    // Render cards
                     scriptsGrid.innerHTML = results.map((file) => {
                         const statusClass = file.status === 'active' ? '' : 'pink';
                         const statusLabel = file.status.charAt(0).toUpperCase() + file.status.slice(1);
-
                         const loadString = `loadstring(game:HttpGet("${file.url}"))()`;
 
                         return `
@@ -1340,7 +2358,6 @@
                         `;
                     }).join('');
 
-                    // Attach event listeners for copy and expand
                     document.querySelectorAll('.btn-copy').forEach(btn => {
                         btn.addEventListener('click', function(e) {
                             e.stopPropagation();
@@ -1371,7 +2388,6 @@
                         });
                     });
 
-                    // Re-trigger reveal
                     document.querySelectorAll('.reveal').forEach(el => {
                         const rect = el.getBoundingClientRect();
                         if (rect.top < window.innerHeight) {
@@ -1451,7 +2467,7 @@
 
 
             // ============================================================
-            // PARTICLES (background)
+            // PARTICLES
             // ============================================================
 
             function initParticles() {
@@ -1593,7 +2609,6 @@
                     }
                 });
 
-                // Smooth scroll for anchor links
                 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                     anchor.addEventListener('click', function(e) {
                         const targetId = this.getAttribute('href');
@@ -1614,12 +2629,11 @@
 
 
             // ============================================================
-            // TITLE TROLL 🎯
+            // TITLE TROLL
             // ============================================================
 
             function initTitleTroll() {
                 const ORIGINAL_TITLE = document.title;
-
                 const TROLL_TITLES = [
                     '👀 yo, where you going?',
                     'come back, the Lua misses you',
@@ -1643,28 +2657,383 @@
                     '🔄 reload me?'
                 ];
 
-                let currentTroll = '';
+                let isHidden = false;
+
+                function setTrollTitle() {
+                    if (isHidden) return;
+                    isHidden = true;
+                    const randomIndex = Math.floor(Math.random() * TROLL_TITLES.length);
+                    document.title = TROLL_TITLES[randomIndex];
+                }
+
+                function restoreTitle() {
+                    if (!isHidden) return;
+                    isHidden = false;
+                    document.title = ORIGINAL_TITLE;
+                }
 
                 document.addEventListener('visibilitychange', () => {
                     if (document.hidden) {
-                        // Pick a random troll message
-                        const randomIndex = Math.floor(Math.random() * TROLL_TITLES.length);
-                        currentTroll = TROLL_TITLES[randomIndex];
-                        document.title = currentTroll;
+                        setTrollTitle();
                     } else {
-                        // Restore original title
-                        document.title = ORIGINAL_TITLE;
+                        restoreTitle();
                     }
                 });
 
-                // Also change title when user clicks away via blur (optional)
-                window.addEventListener('blur', () => {
-                    // If not already hidden, we can set a "blur" message too
-                    // but we already handle visibilitychange, so blur is redundant.
-                    // We'll just rely on visibilitychange.
+                window.addEventListener('blur', setTrollTitle);
+                window.addEventListener('focus', restoreTitle);
+            }
+
+
+            // ============================================================
+            // SECRET THEME
+            // ============================================================
+
+            let secretActive = false;
+            let emojis = [];
+            let animationId = null;
+            let buffer = '';
+
+            function initSecretTheme() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key.length === 1 && e.key.match(/[a-z]/i)) {
+                        buffer += e.key.toLowerCase();
+                        if (buffer.length > 3) buffer = buffer.slice(-3);
+                        if (buffer === 'lol') {
+                            buffer = '';
+                            toggleSecretTheme();
+                        }
+                    }
+                });
+            }
+
+            function toggleSecretTheme() {
+                if (secretActive) {
+                    deactivateSecretTheme();
+                } else {
+                    activateSecretTheme();
+                }
+            }
+
+            function activateSecretTheme() {
+                if (secretActive) return;
+                secretActive = true;
+                document.body.classList.add('secret-theme');
+
+                const container = document.createElement('div');
+                container.className = 'secret-emoji-container';
+                container.id = 'secretEmojiContainer';
+                document.body.appendChild(container);
+
+                const emojiChars = ['😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣', '😂', '🤣'];
+                const count = 25;
+                for (let i = 0; i < count; i++) {
+                    const el = document.createElement('span');
+                    el.className = 'secret-emoji';
+                    el.textContent = emojiChars[i % emojiChars.length];
+                    const size = 30 + Math.random() * 40;
+                    el.style.fontSize = size + 'px';
+                    el.style.left = Math.random() * (window.innerWidth - size) + 'px';
+                    el.style.top = Math.random() * (window.innerHeight - size) + 'px';
+                    container.appendChild(el);
+
+                    emojis.push({
+                        el,
+                        x: parseFloat(el.style.left),
+                        y: parseFloat(el.style.top),
+                        vx: (Math.random() - 0.5) * 6,
+                        vy: (Math.random() - 0.5) * 6,
+                        size: size
+                    });
+                }
+
+                if (animationId) cancelAnimationFrame(animationId);
+                animateEmojis();
+                showToast('😂 Secret theme activated! Type "lol" to turn off.');
+            }
+
+            function deactivateSecretTheme() {
+                if (!secretActive) return;
+                secretActive = false;
+                document.body.classList.remove('secret-theme');
+
+                const container = document.getElementById('secretEmojiContainer');
+                if (container) container.remove();
+
+                emojis = [];
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+                showToast('🔙 Secret theme deactivated.');
+            }
+
+            function animateEmojis() {
+                if (!secretActive) return;
+                const container = document.getElementById('secretEmojiContainer');
+                if (!container) return;
+
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
+                for (let em of emojis) {
+                    em.x += em.vx;
+                    em.y += em.vy;
+
+                    if (em.x <= 0 || em.x + em.size >= width) {
+                        em.vx *= -1;
+                        em.x = Math.max(0, Math.min(em.x, width - em.size));
+                    }
+                    if (em.y <= 0 || em.y + em.size >= height) {
+                        em.vy *= -1;
+                        em.y = Math.max(0, Math.min(em.y, height - em.size));
+                    }
+
+                    em.el.style.left = em.x + 'px';
+                    em.el.style.top = em.y + 'px';
+                }
+
+                animationId = requestAnimationFrame(animateEmojis);
+            }
+
+
+            // ============================================================
+            // ANTI-INSPECT
+            // ============================================================
+
+            function initAntiInspect() {
+                document.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    showToast('🚫 Nice try, inspector!');
+                    return false;
                 });
 
-                console.log('👾 Title troll activated. Try switching tabs!');
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'F12') {
+                        e.preventDefault();
+                        showToast('🚫 F12 is disabled, inspector!');
+                        return false;
+                    }
+
+                    if ((e.ctrlKey || e.metaKey) && (e.shiftKey || e.altKey) && (e.key === 'i' || e.key === 'I')) {
+                        e.preventDefault();
+                        showToast('🚫 Dev tools are locked, inspector!');
+                        return false;
+                    }
+
+                    if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+                        e.preventDefault();
+                        showToast('🚫 Source viewer is disabled!');
+                        return false;
+                    }
+
+                    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'j' || e.key === 'J')) {
+                        e.preventDefault();
+                        showToast('🚫 Console is locked!');
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+
+
+            // ============================================================
+            // TERMINAL DRAG + BUTTONS
+            // ============================================================
+
+            function initTerminalDrag() {
+                if (!terminalBox || !terminalHeader) return;
+
+                let isDragging = false;
+                let isSnapping = false;
+                let dragStartX = 0,
+                    dragStartY = 0;
+                let currentX = 0,
+                    currentY = 0;
+                let dragTimeout = null;
+
+                const startDrag = (e) => {
+                    if (isSnapping) return;
+                    if (e.target.closest('.window-btn')) return;
+
+                    isDragging = true;
+                    terminalBox.classList.add('dragging');
+                    terminalBox.classList.remove('snapping');
+
+                    const clientX = e.clientX || e.touches?.[0]?.clientX || 0;
+                    const clientY = e.clientY || e.touches?.[0]?.clientY || 0;
+
+                    const rect = terminalBox.getBoundingClientRect();
+                    dragStartX = clientX - rect.left;
+                    dragStartY = clientY - rect.top;
+
+                    const transform = window.getComputedStyle(terminalBox).transform;
+                    if (transform && transform !== 'none') {
+                        const matrix = transform.match(/matrix.*\((.+)\)/);
+                        if (matrix) {
+                            const values = matrix[1].split(', ').map(Number);
+                            currentX = values[4] || 0;
+                            currentY = values[5] || 0;
+                        } else {
+                            currentX = 0;
+                            currentY = 0;
+                        }
+                    } else {
+                        currentX = 0;
+                        currentY = 0;
+                    }
+
+                    if (dragTimeout) {
+                        clearTimeout(dragTimeout);
+                        dragTimeout = null;
+                    }
+
+                    dragTimeout = setTimeout(() => {
+                        if (isDragging) {
+                            snapBack();
+                        }
+                    }, 10000);
+
+                    document.addEventListener('mousemove', onDrag);
+                    document.addEventListener('mouseup', endDrag);
+                    document.addEventListener('touchmove', onDrag, { passive: false });
+                    document.addEventListener('touchend', endDrag);
+                };
+
+                const onDrag = (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+
+                    const clientX = e.clientX || e.touches?.[0]?.clientX || 0;
+                    const clientY = e.clientY || e.touches?.[0]?.clientY || 0;
+
+                    const parentRect = terminalBox.parentElement.getBoundingClientRect();
+                    let newX = clientX - parentRect.left - dragStartX;
+                    let newY = clientY - parentRect.top - dragStartY;
+
+                    const maxX = 200,
+                        minX = -200,
+                        maxY = 200,
+                        minY = -200;
+                    if (newX > maxX || newX < minX || newY > maxY || newY < minY) {
+                        snapBack();
+                        return;
+                    }
+
+                    currentX = newX;
+                    currentY = newY;
+                    terminalBox.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                };
+
+                const endDrag = () => {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    terminalBox.classList.remove('dragging');
+                    document.removeEventListener('mousemove', onDrag);
+                    document.removeEventListener('mouseup', endDrag);
+                    document.removeEventListener('touchmove', onDrag);
+                    document.removeEventListener('touchend', endDrag);
+                    if (dragTimeout) {
+                        clearTimeout(dragTimeout);
+                        dragTimeout = null;
+                    }
+                };
+
+                const snapBack = () => {
+                    if (isSnapping) return;
+                    if (isDragging) {
+                        isDragging = false;
+                        terminalBox.classList.remove('dragging');
+                        document.removeEventListener('mousemove', onDrag);
+                        document.removeEventListener('mouseup', endDrag);
+                        document.removeEventListener('touchmove', onDrag);
+                        document.removeEventListener('touchend', endDrag);
+                        if (dragTimeout) {
+                            clearTimeout(dragTimeout);
+                            dragTimeout = null;
+                        }
+                    }
+                    isSnapping = true;
+                    terminalBox.classList.add('snapping');
+                    terminalBox.style.transform = 'translate(0, 0)';
+
+                    const onTransitionEnd = () => {
+                        terminalBox.removeEventListener('transitionend', onTransitionEnd);
+                        isSnapping = false;
+                        terminalBox.classList.remove('snapping');
+                        currentX = 0;
+                        currentY = 0;
+                    };
+                    terminalBox.addEventListener('transitionend', onTransitionEnd);
+                };
+
+                // --- BUTTONS ---
+                if (terminalClose) {
+                    terminalClose.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showToast('🚫 You cannot close this window!');
+                    });
+                }
+
+                if (terminalMinimize) {
+                    terminalMinimize.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        terminalBox.classList.toggle('minimized');
+                        if (terminalBox.classList.contains('minimized')) {
+                            terminalBox.style.transform = 'translate(0, 0)';
+                            terminalBox.classList.remove('dragging', 'snapping');
+                            currentX = 0;
+                            currentY = 0;
+                        }
+                    });
+                }
+
+                if (terminalMaximize) {
+                    terminalMaximize.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showToast('⛶ Fullscreen is not available on this terminal.');
+                    });
+                }
+
+                terminalHeader.addEventListener('mousedown', startDrag);
+                terminalHeader.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    startDrag(e);
+                }, { passive: false });
+
+                terminalHeader.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+
+
+            // ============================================================
+            // DOCS SEARCH
+            // ============================================================
+
+            function initDocsSearch() {
+                let searchTimeout;
+                docsSearch.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        const query = docsSearch.value;
+                        renderDocs(query);
+                    }, 200);
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        docsSearch.focus();
+                        docsSearch.select();
+                    }
+                    if (e.key === 'Escape' && document.activeElement === docsSearch) {
+                        docsSearch.value = '';
+                        secretDocsActive = false;
+                        renderDocs('');
+                        docsSearch.blur();
+                        showToast('🔍 Search cleared');
+                    }
+                });
             }
 
 
@@ -1675,13 +3044,17 @@
             initParticles();
             initReveal();
             initNavbar();
-            initTitleTroll(); // <-- NEW
+            initTitleTroll();
+            initSecretTheme();
+            initExploreButton();
+            initDocsSearch();
+            initAntiInspect();
+            initTerminalDrag();
 
-            // Load live data
             loadScripts();
             loadReadme();
+            renderDocs();
 
-            // Reload button
             if (reloadBtn) {
                 reloadBtn.addEventListener('click', () => {
                     showToast('🔄 Reloading scripts...');
@@ -1690,6 +3063,11 @@
             }
 
             console.log('🚀 dxzlol/67 — Live from GitHub. Matcha + Pink theme loaded.');
+            console.log('📖 Docs loaded:', DOCS_DATA.length, 'functions.');
+            console.log('🤣 Secret theme: type "lol" anywhere to activate!');
+            console.log('🔍 Search docs: Ctrl+K (or Cmd+K)');
+            console.log('📖 Secret docs: type "lol" in the search bar!');
+            console.log('🖱️ Terminal window is draggable (header) with macOS buttons.');
 
         })();
     </script>
