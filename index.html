@@ -38,7 +38,7 @@
             --pink-glow: rgba(244, 143, 177, 0.15);
 
             --border-color: #30363d;
-            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
             --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             --radius: 12px;
             --radius-sm: 6px;
@@ -56,6 +56,28 @@
             line-height: 1.6;
             overflow-x: hidden;
             min-height: 100vh;
+            position: relative;
+        }
+
+        /* ============================================================
+                   WATERMARK (Background Image)
+                   ============================================================ */
+        .watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            opacity: 0.06;
+            pointer-events: none;
+            z-index: 0;
+            user-select: none;
+            filter: grayscale(0.2);
+        }
+        .watermark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         ::-webkit-scrollbar {
@@ -83,7 +105,9 @@
         }
 
         .section-label {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             font-family: var(--font-mono);
             font-size: 0.75rem;
             font-weight: 500;
@@ -95,6 +119,12 @@
             border-radius: 20px;
             border: 1px solid rgba(244, 143, 177, 0.15);
             margin-bottom: 12px;
+        }
+        .section-label .matcha-icon-small {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            object-fit: contain;
         }
 
         .section-title {
@@ -277,12 +307,12 @@
         .hero-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             font-family: var(--font-mono);
             font-size: 0.8rem;
             color: var(--pink);
             background: rgba(244, 143, 177, 0.08);
-            padding: 6px 16px;
+            padding: 6px 18px 6px 12px;
             border-radius: 20px;
             border: 1px solid rgba(244, 143, 177, 0.12);
             margin-bottom: 20px;
@@ -293,6 +323,12 @@
             border-radius: 50%;
             background: var(--matcha);
             animation: pulse-dot 2s infinite;
+        }
+        .hero-badge .matcha-icon-small {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            object-fit: contain;
         }
 
         .hero h1 {
@@ -331,6 +367,42 @@
             flex-wrap: wrap;
             gap: 14px;
         }
+
+        /* Profile Picture in Hero */
+        .hero-pfp-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .hero-pfp {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 4px solid var(--pink);
+            box-shadow: 0 0 48px var(--pink-glow);
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        .hero-pfp:hover {
+            transform: scale(1.03);
+            border-color: var(--matcha);
+            box-shadow: 0 0 64px var(--matcha-glow);
+        }
+        .hero-pfp-label {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            padding: 4px 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+        .hero-pfp-label .highlight-name {
+            color: var(--pink);
+            font-weight: 600;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -361,6 +433,10 @@
             border-color: var(--pink);
             background: rgba(244, 143, 177, 0.06);
             transform: translateY(-2px);
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 0.75rem;
         }
 
         /* ============================================================
@@ -482,8 +558,8 @@
 
         .scripts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 28px;
         }
 
         .script-card {
@@ -494,6 +570,8 @@
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         .script-card::before {
             content: '';
@@ -521,6 +599,8 @@
             align-items: flex-start;
             justify-content: space-between;
             margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .script-card .card-icon {
             font-size: 1.8rem;
@@ -544,39 +624,115 @@
         }
 
         .script-card h3 {
-            font-size: 1.15rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: -0.01em;
             color: var(--pink);
+            font-family: var(--font-mono);
         }
         .script-card .card-desc {
             color: var(--text-secondary);
             font-size: 0.92rem;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             line-height: 1.6;
-            max-height: 80px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
-        .script-card .card-preview {
+
+        /* --- CODE PREVIEW --- */
+        .code-preview-wrapper {
+            position: relative;
             background: var(--bg-primary);
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-sm);
-            padding: 12px 14px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            line-height: 1.6;
-            color: var(--text-secondary);
-            max-height: 120px;
             overflow: hidden;
             margin-bottom: 14px;
-            border: 1px solid var(--border-color);
+        }
+        .code-preview-wrapper .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .code-preview-wrapper .code-header .lang {
+            color: var(--matcha-light);
+        }
+        .code-preview-wrapper .code-header .lines-count {
+            color: var(--pink);
+        }
+
+        .code-preview-wrapper pre {
+            margin: 0;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            line-height: 1.7;
+            max-height: 160px;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
             white-space: pre-wrap;
             word-break: break-all;
+            color: var(--text-secondary);
         }
+        .code-preview-wrapper pre.expanded {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .code-preview-wrapper pre code {
+            display: block;
+            color: var(--text-secondary);
+        }
+
+        .code-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 14px 12px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .code-actions .btn {
+            padding: 4px 14px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: var(--font-mono);
+        }
+        .code-actions .btn:hover {
+            border-color: var(--pink);
+            color: var(--pink);
+            background: rgba(244, 143, 177, 0.05);
+        }
+        .code-actions .btn-copy {
+            background: var(--matcha-dark);
+            border-color: var(--matcha);
+            color: var(--text-primary);
+        }
+        .code-actions .btn-copy:hover {
+            background: var(--matcha);
+            color: #0d1117;
+            border-color: var(--matcha);
+        }
+        .code-actions .btn-expand {
+            background: transparent;
+        }
+        .code-actions .btn-expand:hover {
+            border-color: var(--pink);
+            color: var(--pink);
+        }
+
         .script-card .card-footer {
-            margin-top: 16px;
+            margin-top: auto;
             padding-top: 14px;
             border-top: 1px solid var(--border-color);
             display: flex;
@@ -668,6 +824,9 @@
         .footer .copy {
             font-size: 0.85rem;
             color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .footer .copy a {
             color: var(--pink);
@@ -675,6 +834,12 @@
         }
         .footer .copy a:hover {
             color: var(--matcha);
+        }
+        .footer .copy .matcha-icon-small {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            object-fit: contain;
         }
         .footer .socials {
             display: flex;
@@ -748,6 +913,33 @@
         }
 
         /* ============================================================
+                   TOAST NOTIFICATION
+                   ============================================================ */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--matcha);
+            color: var(--text-primary);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        /* ============================================================
                    RESPONSIVE
                    ============================================================ */
         @media (max-width: 992px) {
@@ -762,6 +954,18 @@
             }
             .hero-actions {
                 justify-content: center;
+            }
+            .hero-pfp-section {
+                align-items: center;
+            }
+            .scripts-grid {
+                grid-template-columns: 1fr;
+            }
+            .watermark {
+                width: 120px;
+                height: 120px;
+                bottom: 10px;
+                right: 10px;
             }
         }
 
@@ -791,9 +995,6 @@
                 margin-top: 8px;
             }
 
-            .scripts-grid {
-                grid-template-columns: 1fr;
-            }
             .footer .container {
                 flex-direction: column;
                 text-align: center;
@@ -804,10 +1005,54 @@
             .readme-box {
                 padding: 20px;
             }
+            .scripts-grid {
+                grid-template-columns: 1fr;
+            }
+            .code-preview-wrapper pre {
+                font-size: 0.7rem;
+                padding: 10px 12px;
+            }
+            .hero-pfp {
+                width: 120px;
+                height: 120px;
+            }
+            .watermark {
+                width: 80px;
+                height: 80px;
+                bottom: 6px;
+                right: 6px;
+                opacity: 0.04;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            .script-card {
+                padding: 18px 16px;
+            }
+            .code-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- ============================================================
+    WATERMARK (Matcha Icon)
+    ============================================================ -->
+    <div class="watermark">
+        <!-- Your official Matcha icon from Discord CDN -->
+        <img src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
+    </div>
+
+    <!-- ============================================================
+    TOAST
+    ============================================================ -->
+    <div class="toast" id="toast"></div>
 
     <!-- ============================================================
     PARTICLE CANVAS
@@ -852,6 +1097,7 @@
             <div class="hero-content">
                 <div class="hero-badge">
                     <span class="dot"></span>
+                    <img class="matcha-icon-small" src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
                     <span>Live from GitHub · 67 repo (Lua)</span>
                 </div>
                 <h1>
@@ -877,24 +1123,15 @@
             </div>
 
             <div class="hero-visual">
-                <div class="terminal-box">
-                    <div class="terminal-header">
-                        <span class="terminal-dot red"></span>
-                        <span class="terminal-dot yellow"></span>
-                        <span class="terminal-dot green"></span>
-                        <span class="terminal-title">~/67/matcha (lua)</span>
-                    </div>
-                    <div class="terminal-body">
-                        <div class="line"><span class="prompt">$</span> <span class="cmd">git clone https://github.com/dxzlol/67</span></div>
-                        <div class="line"><span class="output">Cloning into '67'...</span></div>
-                        <div class="line"><span class="output">remote: Enumerating objects: <span class="highlight-out">47</span>, done.</span></div>
-                        <div class="line"><span class="prompt">$</span> <span class="cmd">cd 67/scripts</span></div>
-                        <div class="line"><span class="prompt">$</span> <span class="cmd">ls -la</span></div>
-                        <div class="line"><span class="output">├── <span class="highlight-out">UI.lua</span>              · WaifuUI + HomesickUI</span></div>
-                        <div class="line"><span class="output">├── <span class="highlight-out">survivehomelander.lua</span>  · ESP + Homelander detection</span></div>
-                        <div class="line"><span class="output">└── <span class="highlight-out">README.md</span>            · project docs</span></div>
+                <!-- Profile Picture Section -->
+                <div class="hero-pfp-section">
+                    <img class="hero-pfp" src="https://github.com/dxzlol.png" alt="dxzlol" />
+                    <div class="hero-pfp-label">
+                        <span class="highlight-name">dxzlol</span> · maker
                     </div>
                 </div>
+                <!-- (Optional: you could also keep the terminal here, but we replaced it with PFP for uniqueness) -->
+                <!-- I'll keep the PFP only, but you can swap back to terminal if you prefer -->
             </div>
         </div>
     </section>
@@ -906,7 +1143,10 @@
         <div class="container">
             <div class="scripts-header reveal">
                 <div>
-                    <span class="section-label">📦 Live from GitHub</span>
+                    <span class="section-label">
+                        <img class="matcha-icon-small" src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
+                        📦 Live from GitHub
+                    </span>
                     <h2 class="section-title">
                         Matcha <span class="highlight">Lua</span> Scripts
                     </h2>
@@ -935,7 +1175,10 @@
     <section class="readme-section" id="readme">
         <div class="container">
             <div class="reveal" style="text-align:center;">
-                <span class="section-label">📄 README</span>
+                <span class="section-label">
+                    <img class="matcha-icon-small" src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
+                    📄 README
+                </span>
                 <h2 class="section-title">
                     Project <span class="highlight">Overview</span>
                 </h2>
@@ -958,6 +1201,7 @@
     <footer class="footer">
         <div class="container">
             <div class="copy">
+                <img class="matcha-icon-small" src="https://cdn.discordapp.com/attachments/1434115121709449356/1434116750793904240/logo_transparency.png?ex=6a39ad8d&is=6a385c0d&hm=2f782787cfab6a68d855d23b0674864038299255a741c82e24b6e8ef3f082462&" alt="Matcha" />
                 © 2026 <a href="https://github.com/dxzlol" target="_blank" rel="noopener noreferrer">dxzlol</a>
                 · Built with <span style="color:var(--pink);">❤</span>
                 · <span style="color:var(--text-muted);">67/matcha (Lua)</span>
@@ -981,7 +1225,7 @@
             'use strict';
 
             // ============================================================
-            // CONFIG — your GitHub raw URLs
+            // CONFIG
             // ============================================================
 
             const REPO_RAW = 'https://raw.githubusercontent.com/dxzlol/67/main';
@@ -1017,15 +1261,30 @@
             const hamburger = document.getElementById('hamburger');
             const navLinks = document.getElementById('navLinks');
             const canvas = document.getElementById('particles-canvas');
+            const toast = document.getElementById('toast');
+
+            let toastTimeout = null;
+
+            // ============================================================
+            // TOAST
+            // ============================================================
+
+            function showToast(message) {
+                toast.textContent = message;
+                toast.classList.add('show');
+                if (toastTimeout) clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2500);
+            }
 
 
             // ============================================================
-            // FETCH & RENDER SCRIPTS
+            // LOAD SCRIPTS
             // ============================================================
 
             async function loadScripts() {
                 try {
-                    // Show loading state
                     scriptsGrid.innerHTML = `
                         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
                             ⏳ Fetching scripts from GitHub...
@@ -1038,13 +1297,13 @@
                                 const resp = await fetch(file.url);
                                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                                 const content = await resp.text();
-                                // Get first 5 lines for preview
-                                const lines = content.split('\n').slice(0, 6);
-                                const preview = lines.join('\n').trim() || '(empty file)';
-                                return { ...file, content, preview, error: null };
+                                const lines = content.split('\n');
+                                const totalLines = lines.length;
+                                const previewLines = lines.slice(0, 15).join('\n');
+                                return { ...file, content, preview: previewLines, totalLines, error: null };
                             } catch (err) {
-                                return { ...file, content: null, preview: '⚠️ Failed to load', error: err
-                                    .message };
+                                return { ...file, content: null, preview: '⚠️ Failed to load', totalLines: 0,
+                                    error: err.message };
                             }
                         })
                     );
@@ -1054,18 +1313,36 @@
                         const statusClass = file.status === 'active' ? '' : 'pink';
                         const statusLabel = file.status.charAt(0).toUpperCase() + file.status.slice(1);
 
+                        const loadString = `loadstring(game:HttpGet("${file.url}"))()`;
+
                         return `
-                            <div class="script-card reveal">
+                            <div class="script-card reveal" data-id="${file.id}">
                                 <div class="card-top">
                                     <span class="card-icon">${file.icon}</span>
                                     <span class="card-status ${statusClass}">${statusLabel}</span>
                                 </div>
                                 <h3>${file.name}</h3>
                                 <p class="card-desc">${file.description}</p>
-                                <div class="card-preview">${escapeHtml(file.preview)}</div>
-                                <div class="card-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-                                    ${file.tags.map(t => `<span style="font-size:0.7rem;font-family:var(--font-mono);padding:2px 12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid var(--border-color);color:var(--text-muted);">#${t}</span>`).join('')}
+
+                                <div class="code-preview-wrapper">
+                                    <div class="code-header">
+                                        <span class="lang">Lua</span>
+                                        <span class="lines-count">${file.totalLines} lines</span>
+                                    </div>
+                                    <pre id="preview-${file.id}" class="${file.error ? '' : 'expanded'}"><code>${escapeHtml(file.error ? file.preview : file.preview)}</code></pre>
+                                    <div class="code-actions">
+                                        <button class="btn btn-copy" data-url="${file.url}" data-loadstring="${encodeURIComponent(loadString)}">
+                                            📋 Copy Loadstring
+                                        </button>
+                                        <button class="btn btn-expand" data-id="${file.id}">
+                                            ${file.error ? '🔒 Unavailable' : '🔽 Expand'}
+                                        </button>
+                                        <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="btn" style="text-decoration:none;">
+                                            📄 Raw
+                                        </a>
+                                    </div>
                                 </div>
+
                                 <div class="card-footer">
                                     <span>${file.error ? '⚠️ ' + file.error : '✅ Loaded'}</span>
                                     <a href="${file.url}" target="_blank" rel="noopener noreferrer" class="repo-link">
@@ -1076,7 +1353,38 @@
                         `;
                     }).join('');
 
-                    // Re-trigger reveal animations
+                    // Attach event listeners for copy and expand
+                    document.querySelectorAll('.btn-copy').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const rawUrl = this.dataset.url;
+                            const fullCmd = `loadstring(game:HttpGet("${rawUrl}"))()`;
+                            navigator.clipboard.writeText(fullCmd).then(() => {
+                                showToast(`✅ Copied loadstring for ${this.closest('.script-card').querySelector('h3').textContent}`);
+                            }).catch(() => {
+                                const textArea = document.createElement('textarea');
+                                textArea.value = fullCmd;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                showToast('✅ Copied to clipboard (fallback)');
+                            });
+                        });
+                    });
+
+                    document.querySelectorAll('.btn-expand').forEach(btn => {
+                        btn.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const id = this.dataset.id;
+                            const pre = document.getElementById(`preview-${id}`);
+                            if (!pre) return;
+                            const isExpanded = pre.classList.toggle('expanded');
+                            this.textContent = isExpanded ? '🔼 Collapse' : '🔽 Expand';
+                        });
+                    });
+
+                    // Re-trigger reveal
                     document.querySelectorAll('.reveal').forEach(el => {
                         const rect = el.getBoundingClientRect();
                         if (rect.top < window.innerHeight) {
@@ -1095,7 +1403,7 @@
 
 
             // ============================================================
-            // FETCH & RENDER README
+            // LOAD README
             // ============================================================
 
             async function loadReadme() {
@@ -1110,7 +1418,6 @@
                     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                     const content = await resp.text();
 
-                    // Simple markdown-like rendering (just for readability)
                     const html = content
                         .replace(/&/g, '&amp;')
                         .replace(/</g, '&lt;')
