@@ -652,7 +652,7 @@
         }
         .code-preview-wrapper pre code {
             display: block;
-            color: #f0f6fc !important; /* force white for visibility */
+            color: #f0f6fc !important;
             background: transparent !important;
         }
 
@@ -1614,12 +1614,68 @@
 
 
             // ============================================================
+            // TITLE TROLL 🎯
+            // ============================================================
+
+            function initTitleTroll() {
+                const ORIGINAL_TITLE = document.title;
+
+                const TROLL_TITLES = [
+                    '👀 yo, where you going?',
+                    'come back, the Lua misses you',
+                    'i\'m watching...',
+                    'you left me for another tab? 😢',
+                    'scripts are sad without you',
+                    '👋 hey, i\'m still here',
+                    '🍵 matcha got cold...',
+                    '👾 you forgot about me',
+                    '🤖 beep boop, come back',
+                    '😤 rude much?',
+                    '🫣 i see you...',
+                    '🎮 game over?',
+                    '💔 you broke my heart',
+                    '😈 i\'m telling your mom',
+                    '🔙 back soon?',
+                    '👻 boo!',
+                    '😴 i\'m falling asleep...',
+                    '📢 HELLO?',
+                    '💀 i\'m dying over here',
+                    '🔄 reload me?'
+                ];
+
+                let currentTroll = '';
+
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        // Pick a random troll message
+                        const randomIndex = Math.floor(Math.random() * TROLL_TITLES.length);
+                        currentTroll = TROLL_TITLES[randomIndex];
+                        document.title = currentTroll;
+                    } else {
+                        // Restore original title
+                        document.title = ORIGINAL_TITLE;
+                    }
+                });
+
+                // Also change title when user clicks away via blur (optional)
+                window.addEventListener('blur', () => {
+                    // If not already hidden, we can set a "blur" message too
+                    // but we already handle visibilitychange, so blur is redundant.
+                    // We'll just rely on visibilitychange.
+                });
+
+                console.log('👾 Title troll activated. Try switching tabs!');
+            }
+
+
+            // ============================================================
             // INIT
             // ============================================================
 
             initParticles();
             initReveal();
             initNavbar();
+            initTitleTroll(); // <-- NEW
 
             // Load live data
             loadScripts();
