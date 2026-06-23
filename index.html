@@ -623,12 +623,6 @@
             color: var(--pink);
         }
 
-        /* --- FORCE VISIBILITY FOR .LUA LINES --- */
-        .terminal-body .line[data-lua="true"] {
-            opacity: 1 !important;
-            animation: typeIn 0.5s ease forwards, glowFlow 2.5s ease-in-out infinite alternate;
-        }
-
         /* Glowing, flowing effect for .lua lines – only on hover */
         .terminal-box:hover .line[data-lua="true"] {
             animation: typeIn 0.5s ease forwards, glowFlow 2.5s ease-in-out infinite alternate;
@@ -1601,14 +1595,13 @@
                         </div>
                         <span class="terminal-title">read me bruh</span>
                     </div>
-                    <div class="terminal-body">
+                    <div class="terminal-body" id="terminalBody">
                         <div class="line"><span class="prompt">$</span> <span class="cmd">git clone https://github.com/dxzlol/67</span></div>
                         <div class="line"><span class="output">Cloning into '67'...</span></div>
                         <div class="line"><span class="output">remote: Enumerating objects: <span class="highlight-out">47</span>, done.</span></div>
                         <div class="line"><span class="prompt">$</span> <span class="cmd">cd 67/scripts</span></div>
                         <div class="line"><span class="prompt">$</span> <span class="cmd">ls -la</span></div>
-                        <div class="line" data-lua="true"><span class="output">├── <span class="highlight-out">UI.lua</span>              · WaifuUI + HomesickUI</span></div>
-                        <div class="line" data-lua="true"><span class="output">├── <span class="highlight-out">survivehomelander.lua</span>  · ESP + Homelander detection</span></div>
+                        <!-- .lua lines will be injected here dynamically -->
                         <div class="line"><span class="output">└── <span class="highlight-out">README.md</span>            · read me bruh</span></div>
                     </div>
                 </div>
@@ -1757,7 +1750,6 @@
             // ============================================================
 
             const REPO_RAW = 'https://raw.githubusercontent.com/dxzlol/67/main';
-            // Use the refs/heads/main URL for README (as requested)
             const README_URL = 'https://raw.githubusercontent.com/dxzlol/67/refs/heads/main/README.md';
 
             // ============================================================
@@ -1894,10 +1886,6 @@
                 returns: 'nil',
                 example: 'win:SetSize(500, 400)'
             }];
-
-            // ============================================================
-            // SECRET DOCS DATA (Easter egg)
-            // ============================================================
 
             const SECRET_DOCS = [{
                 name: 'How to exit Vim',
@@ -2062,6 +2050,73 @@
                         this.classList.remove('rotated');
                     }, 800);
                 });
+            }
+
+
+            // ============================================================
+            // UPDATE TERMINAL WITH DYNAMIC .LUA FILES
+            // ============================================================
+
+            function updateTerminalFiles(luaFiles) {
+                const terminalBody = document.getElementById('terminalBody');
+                if (!terminalBody) {
+                    console.warn('⚠️ Terminal body not found');
+                    return;
+                }
+
+                // Get all existing child nodes
+                const children = Array.from(terminalBody.children);
+
+                // Separate static lines (no data-lua) and the README line
+                const staticLines = children.filter(line => !line.hasAttribute('data-lua') && !line.textContent.includes('README.md'));
+                const readmeLine = children.find(line => line.textContent.includes('README.md'));
+
+                // Build new lua lines
+                const luaLines = luaFiles.map(file => {
+                    const div = document.createElement('div');
+                    div.className = 'line';
+                    div.setAttribute('data-lua', 'true');
+                    const description = file.name
+                        .replace('.lua', '')
+                        .replace(/([A-Z])/g, ' $1')
+                        .replace(/_/g, ' ')
+                        .trim();
+                    div.innerHTML =
+                        `<span class="output">├── <span class="highlight-out">${file.name}</span>${' '.repeat(Math.max(1, 30 - file.name.length))}· ${description}</span>`;
+                    return div;
+                });
+
+                // Rebuild terminal body
+                terminalBody.innerHTML = '';
+                // Add static lines (git clone, cd, ls, etc.)
+                staticLines.forEach(line => terminalBody.appendChild(line.cloneNode(true)));
+                // Add lua lines
+                luaLines.forEach(line => terminalBody.appendChild(line));
+                // Add README line (ensure it says 'read me bruh')
+                if (readmeLine) {
+                    const newReadme = readmeLine.cloneNode(true);
+                    const outputSpan = newReadme.querySelector('.output');
+                    if (outputSpan) {
+                        outputSpan.innerHTML = outputSpan.innerHTML.replace(/·.*$/, '· read me bruh');
+                    }
+                    terminalBody.appendChild(newReadme);
+                } else {
+                    const div = document.createElement('div');
+                    div.className = 'line';
+                    div.innerHTML =
+                        `<span class="output">└── <span class="highlight-out">README.md</span>            · read me bruh</span>`;
+                    terminalBody.appendChild(div);
+                }
+
+                // Re-trigger typewriter animation
+                terminalBody.querySelectorAll('.line').forEach(line => {
+                    line.style.animation = 'none';
+                    requestAnimationFrame(() => {
+                        line.style.animation = '';
+                    });
+                });
+
+                console.log(`🖥️ Terminal updated with ${luaFiles.length} .lua files`);
             }
 
 
@@ -2266,40 +2321,54 @@
             // LOAD SCRIPTS (auto-discover from GitHub API)
             // ============================================================
 
-            async function loadScripts() {
+            async function loadScripts(retryCount = 0) {
                 try {
                     scriptsGrid.innerHTML = `
                         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
-                            ⏳ Fetching scripts from GitHub...
+                            ⏳ Loading scripts from GitHub...
                         </div>
                     `;
 
-                    // Fetch ALL files from the root of the repo
+                    console.log('📡 Fetching scripts from GitHub API...');
+
                     const apiUrl = 'https://api.github.com/repos/dxzlol/67/contents/';
                     const response = await fetch(apiUrl);
 
                     if (!response.ok) {
-                        throw new Error(`GitHub API error: ${response.status}`);
+                        throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
                     }
 
                     const files = await response.json();
+                    console.log(`📁 Found ${files.length} files in repo`);
 
-                    // Filter for .lua files only
-                    const luaFiles = files.filter(file => file.name.endsWith('.lua'));
+                    let luaFiles = files.filter(file => file.name.endsWith('.lua'));
+                    luaFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+                    console.log(`📜 Found ${luaFiles.length} .lua files:`, luaFiles.map(f => f.name));
+
+                    // Update terminal with the list
+                    if (luaFiles.length > 0) {
+                        updateTerminalFiles(luaFiles);
+                    }
 
                     if (luaFiles.length === 0) {
                         scriptsGrid.innerHTML = `
                             <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-secondary);">
+                                <span style="font-size:3rem;display:block;margin-bottom:12px;">📂</span>
                                 No .lua scripts found in the repository root.
+                                <br><br>
+                                <span style="font-size:0.8rem;color:var(--text-muted);">
+                                    Try adding a .lua file or check the repo URL.
+                                </span>
                             </div>
                         `;
                         return;
                     }
 
-                    // Fetch content for each .lua file
                     const results = await Promise.all(
                         luaFiles.map(async (file) => {
                             try {
+                                console.log(`⬇️ Fetching content for ${file.name}...`);
                                 const resp = await fetch(file.download_url);
                                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                                 const content = await resp.text();
@@ -2311,13 +2380,11 @@
                                     const firstChars = content.substring(0, 200);
                                     preview = firstChars ? `-- (first 200 chars) \n${firstChars}` : '-- (file is empty)';
                                 }
-                                // Auto-generate description from filename
                                 const description = file.name
                                     .replace('.lua', '')
                                     .replace(/([A-Z])/g, ' $1')
                                     .replace(/_/g, ' ')
                                     .trim();
-                                // Auto-generate tags from filename
                                 const tags = file.name
                                     .replace('.lua', '')
                                     .split(/[_-]/)
@@ -2338,6 +2405,7 @@
                                     error: null
                                 };
                             } catch (err) {
+                                console.error(`❌ Failed to load ${file.name}:`, err);
                                 return {
                                     id: file.name.replace('.lua', ''),
                                     name: file.name,
@@ -2355,7 +2423,8 @@
                         })
                     );
 
-                    // Render cards
+                    console.log(`✅ Loaded ${results.filter(r => !r.error).length}/${results.length} scripts successfully`);
+
                     scriptsGrid.innerHTML = results.map((file) => {
                         const statusClass = file.status === 'active' ? '' : 'pink';
                         const statusLabel = file.status.charAt(0).toUpperCase() + file.status.slice(1);
@@ -2399,7 +2468,6 @@
                         `;
                     }).join('');
 
-                    // Attach event listeners for copy and expand
                     document.querySelectorAll('.btn-copy').forEach(btn => {
                         btn.addEventListener('click', function(e) {
                             e.stopPropagation();
@@ -2430,7 +2498,6 @@
                         });
                     });
 
-                    // Re-trigger reveal
                     document.querySelectorAll('.reveal').forEach(el => {
                         const rect = el.getBoundingClientRect();
                         if (rect.top < window.innerHeight) {
@@ -2438,10 +2505,26 @@
                         }
                     });
 
+                    showToast(`✅ Loaded ${results.filter(r => !r.error).length} scripts`);
+
                 } catch (err) {
+                    console.error('❌ loadScripts error:', err);
+
+                    if (retryCount === 0) {
+                        console.log('🔄 Retrying loadScripts in 2 seconds...');
+                        setTimeout(() => loadScripts(1), 2000);
+                        return;
+                    }
+
                     scriptsGrid.innerHTML = `
                         <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--pink);">
-                            ❌ Failed to load scripts: ${err.message}
+                            <span style="font-size:3rem;display:block;margin-bottom:12px;">⚠️</span>
+                            <h3 style="margin-bottom:8px;">Failed to load scripts</h3>
+                            <p style="color:var(--text-secondary);font-size:0.9rem;">${err.message}</p>
+                            <br>
+                            <button onclick="loadScripts()" class="btn btn-outline" style="margin-top:8px;">
+                                🔄 Retry
+                            </button>
                         </div>
                     `;
                 }
@@ -3084,37 +3167,48 @@
             // INIT
             // ============================================================
 
-            initParticles();
-            initReveal();
-            initNavbar();
-            initTitleTroll();
-            initSecretTheme();
-            initExploreButton();
-            initDocsSearch();
-            initAntiInspect();
-            initTerminalDrag();
+            function init() {
+                initParticles();
+                initReveal();
+                initNavbar();
+                initTitleTroll();
+                initSecretTheme();
+                initExploreButton();
+                initDocsSearch();
+                initAntiInspect();
+                initTerminalDrag();
 
-            // Load live data
-            loadScripts();
-            loadReadme();
-
-            // Render docs (static, no fetch needed)
-            renderDocs();
-
-            // Reload button
-            if (reloadBtn) {
-                reloadBtn.addEventListener('click', () => {
-                    showToast('🔄 Reloading scripts...');
+                if (document.readyState === 'complete') {
                     loadScripts();
-                });
+                } else {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        setTimeout(loadScripts, 100);
+                    });
+                    window.addEventListener('load', () => {
+                        setTimeout(loadScripts, 50);
+                    });
+                }
+
+                loadReadme();
+                renderDocs();
+
+                if (reloadBtn) {
+                    reloadBtn.addEventListener('click', () => {
+                        showToast('🔄 Reloading scripts...');
+                        loadScripts();
+                    });
+                }
+
+                console.log('🚀 dxzlol/67 — Live from GitHub. Matcha + Pink theme loaded.');
+                console.log('📖 Docs loaded:', DOCS_DATA.length, 'functions.');
+                console.log('🤣 Secret theme: type "lol" anywhere to activate!');
+                console.log('🔍 Search docs: Ctrl+K (or Cmd+K)');
+                console.log('📖 Secret docs: type "lol" in the search bar!');
+                console.log('🖱️ Terminal window is draggable (header) with macOS buttons.');
             }
 
-            console.log('🚀 dxzlol/67 — Live from GitHub. Matcha + Pink theme loaded.');
-            console.log('📖 Docs loaded:', DOCS_DATA.length, 'functions.');
-            console.log('🤣 Secret theme: type "lol" anywhere to activate!');
-            console.log('🔍 Search docs: Ctrl+K (or Cmd+K)');
-            console.log('📖 Secret docs: type "lol" in the search bar!');
-            console.log('🖱️ Terminal window is draggable (header) with macOS buttons.');
+            // Run init
+            init();
 
         })();
     </script>
