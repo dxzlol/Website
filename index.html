@@ -47,6 +47,123 @@ html[data-theme="valentine"] {
   --icon-url: url('https://raw.githubusercontent.com/dxzlol/Website/main/icons/%21matchalt.png');
   --particle-a: #ec407a; --particle-b: #f06292; --particle-c: #ff80ab; --particle-d: #e91e63; --particle-e: #ffb3c6;
 }
+html[data-theme="snow"] {
+  /* LIGHT THEME — glacier blue base, white cards */
+  --bg-primary: #e8f4fa;
+  --bg-secondary: #d4e8f2;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f5fafd;
+  --text-primary: #0a2a3a;
+  --text-secondary: #3d5f73;
+  --text-muted: #6b8a9e;
+  --accent-a: #0288d1;
+  --accent-a-light: #4fc3f7;
+  --accent-a-dark: #01579b;
+  --accent-b: #00acc1;
+  --accent-b-dark: #00838f;
+  --glow-a: rgba(2,136,209,0.25);
+  --glow-b: rgba(0,172,193,0.25);
+  --border-color: #b8d9e8;
+  --icon-url: url('https://raw.githubusercontent.com/dxzlol/Website/main/icons/%21matchaft.png');
+  --particle-a: #0288d1;
+  --particle-b: #00acc1;
+  --particle-c: #4fc3f7;
+  --particle-d: #81d4fa;
+  --particle-e: #01579b;
+}
+
+/* Snow theme — light-specific overrides for elements with hardcoded dark values */
+html[data-theme="snow"] .navbar {
+  background: rgba(232,244,250,0.85);
+  border-bottom-color: rgba(184,217,232,0.6);
+}
+html[data-theme="snow"] .navbar.scrolled {
+  background: rgba(232,244,250,0.97);
+}
+html[data-theme="snow"] .nav-gh-btn,
+html[data-theme="snow"] .btn-primary {
+  color: #ffffff !important;
+}
+html[data-theme="snow"] .terminal-header {
+  background: rgba(2,136,209,0.06);
+}
+html[data-theme="snow"] .terminal-box {
+  box-shadow: 0 24px 80px rgba(2,136,209,0.15), 0 0 60px rgba(79,195,247,0.1);
+}
+html[data-theme="snow"] .watermark .brand-icon {
+  opacity: 0.15;
+}
+html[data-theme="snow"] .watermark-emoji {
+  opacity: 0.55;
+  filter: drop-shadow(0 0 8px rgba(2,136,209,0.6));
+}
+html[data-theme="snow"] #particles-canvas {
+  opacity: 0.28;
+}
+html[data-theme="snow"] .section-label,
+html[data-theme="snow"] .hero-badge {
+  background: rgba(2,136,209,0.08);
+  border-color: rgba(2,136,209,0.22);
+  color: var(--accent-a);
+}
+html[data-theme="snow"] .card-status {
+  background: rgba(2,136,209,0.1);
+  color: var(--accent-a);
+  border-color: rgba(2,136,209,0.25);
+}
+html[data-theme="snow"] .script-card {
+  box-shadow: 0 2px 12px rgba(2,136,209,0.06);
+}
+html[data-theme="snow"] .script-card:hover {
+  box-shadow: 0 12px 48px rgba(2,136,209,0.15);
+}
+html[data-theme="snow"] .stat-pill {
+  box-shadow: 0 2px 8px rgba(2,136,209,0.06);
+}
+html[data-theme="snow"] .code-header {
+  background: rgba(2,136,209,0.04);
+}
+html[data-theme="snow"] .code-header .lang {
+  color: var(--accent-a);
+}
+html[data-theme="snow"] .readme-box {
+  box-shadow: 0 8px 32px rgba(2,136,209,0.08);
+}
+html[data-theme="snow"] .readme-box h1,
+html[data-theme="snow"] .readme-box h2,
+html[data-theme="snow"] .readme-box h3 {
+  color: var(--accent-a);
+}
+html[data-theme="snow"] .readme-box code {
+  color: var(--accent-a);
+  background: rgba(2,136,209,0.08);
+}
+html[data-theme="snow"] .arcade-hud {
+  background: rgba(2,136,209,0.08);
+}
+html[data-theme="snow"] .g2048-tile:not(.has-value) {
+  background: rgba(2,136,209,0.08);
+}
+html[data-theme="snow"] .toast,
+html[data-theme="snow"] .achievement-toast {
+  box-shadow: 0 8px 32px rgba(2,136,209,0.15), 0 0 30px rgba(79,195,247,0.15);
+}
+html[data-theme="snow"] .theme-picker,
+html[data-theme="snow"] .portal-content {
+  box-shadow: 0 20px 80px rgba(2,136,209,0.15);
+}
+html[data-theme="snow"] .arcade-menu button.active,
+html[data-theme="snow"] .theme-option.active {
+  color: #ffffff;
+}
+html[data-theme="snow"] .arcade-menu button.active .theme-desc,
+html[data-theme="snow"] .theme-option.active .theme-desc {
+  color: rgba(255,255,255,0.85);
+}
+html[data-theme="snow"] .view-toggle button.active {
+  color: #ffffff;
+}
+  
 :root {
   --grad: linear-gradient(135deg, var(--accent-a), var(--accent-b));
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
@@ -65,6 +182,12 @@ html[data-theme="halloween"] body::before {
   content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background: radial-gradient(circle at 50% 100%, rgba(156,39,176,0.15), transparent 55%),
               radial-gradient(circle at 15% 5%, rgba(255,152,0,0.08), transparent 45%);
+}
+html[data-theme="snow"] body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(79,195,247,0.10), transparent 55%),
+              radial-gradient(circle at 90% 100%, rgba(255,255,255,0.05), transparent 40%),
+              radial-gradient(circle at 10% 50%, rgba(179,229,252,0.06), transparent 45%);
 }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-secondary); }
@@ -107,11 +230,36 @@ html[data-theme="halloween"] body::before {
 }
 .section-sub { color: var(--text-secondary); font-size: 1.05rem; max-width: 560px; }
 
+/* ============================================================
+   WATERMARK + FLOATING SEASONAL EMOJI (FIXED)
+   ============================================================ */
 .watermark {
-  position: fixed; bottom: 20px; right: 20px; width: 180px; height: 180px;
-  opacity: 0.06; pointer-events: none; z-index: 0;
+  position: fixed; bottom: 20px; right: 20px;
+  width: 180px; height: 180px;
+  opacity: 1 !important; /* override old 0.06 */
+  pointer-events: none; z-index: 0; overflow: visible;
 }
-.watermark .brand-icon { width: 100%; height: 100%; }
+.watermark .brand-icon {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  opacity: 0.06; /* the icon itself stays faint */
+  transition: opacity var(--theme-transition), background-image var(--theme-transition);
+}
+.watermark-emoji {
+  position: absolute; top: 0; left: 0;
+  z-index: 2;                 /* above brand icon */
+  pointer-events: none; user-select: none;
+  will-change: transform;
+  opacity: 0.5;               /* clearly visible */
+  filter: drop-shadow(0 0 10px var(--glow-b));
+  line-height: 1;
+  transition: opacity 0.4s ease;
+}
+html[data-theme="halloween"] .watermark-emoji { filter: drop-shadow(0 0 10px var(--glow-a)); }
+html[data-theme="christmas"] .watermark-emoji { filter: drop-shadow(0 0 10px rgba(229,57,53,0.55)); }
+html[data-theme="valentine"] .watermark-emoji { filter: drop-shadow(0 0 10px rgba(236,64,122,0.6)); }
+html[data-theme="snow"] .watermark-emoji { filter: drop-shadow(0 0 10px rgba(79,195,247,0.7)); }
+
 #particles-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.35; }
 
 .toast {
@@ -160,19 +308,6 @@ html[data-theme="halloween"] body::before {
 }
 .nav-links a:hover { color: var(--text-primary); }
 .nav-links a:hover::after { width: 100%; }
-.theme-toggle {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; background: transparent;
-  border: 1px solid var(--border-color); border-radius: var(--radius-sm);
-  font-size: 1.15rem; cursor: pointer; transition: all var(--transition); padding: 0;
-  box-shadow: 0 0 12px var(--glow-b);
-}
-.theme-toggle:hover {
-  border-color: var(--accent-b);
-  transform: scale(1.08);
-  box-shadow: 0 0 20px var(--glow-b);
-}
-.theme-toggle.hidden { display: none; }
 .nav-gh-btn {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 18px; border-radius: var(--radius-sm); background: var(--grad);
@@ -594,26 +729,16 @@ html[data-theme="halloween"] body::before {
 
 /* ==================== PORTAL — RUNNING CANDLE ==================== */
 .portal-zone {
-  position: relative;
-  z-index: 1;
-  min-height: 90px;
-  margin-top: 20px;
-  overflow: hidden;
-  padding: 0;
-  background: transparent;
+  position: relative; z-index: 1;
+  min-height: 90px; margin-top: 20px;
+  overflow: hidden; padding: 0; background: transparent;
 }
 .portal-hint {
-  position: absolute;
-  left: 20px;
-  top: 50%;
+  position: absolute; left: 20px; top: 50%;
   transform: translateY(-50%);
-  font-size: 2rem;
-  line-height: 1;
-  cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  z-index: 2;
-  will-change: left;
+  font-size: 2rem; line-height: 1;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+  z-index: 2; will-change: left;
   filter: drop-shadow(0 0 12px rgba(255,180,80,0.7));
   animation: candleFlicker 1.5s ease-in-out infinite;
   transition: font-size 0.2s ease;
@@ -621,17 +746,10 @@ html[data-theme="halloween"] body::before {
 .portal-hint:hover { font-size: 2.4rem; }
 .portal-hint::after {
   content: 'click me';
-  position: absolute;
-  top: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.65rem;
-  font-family: var(--font-mono);
-  color: var(--accent-b);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.3s;
-  pointer-events: none;
+  position: absolute; top: -28px; left: 50%; transform: translateX(-50%);
+  font-size: 0.65rem; font-family: var(--font-mono);
+  color: var(--accent-b); white-space: nowrap;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
   text-shadow: 0 0 8px var(--glow-b);
 }
 .portal-hint:hover::after { opacity: 1; }
@@ -700,7 +818,7 @@ html[data-theme="halloween"] body::before {
 }
 .theme-picker {
   position: relative; background: var(--bg-card); border: 1px solid var(--border-color);
-  border-radius: var(--radius); padding: 24px; max-width: 540px; width: 100%;
+  border-radius: var(--radius); padding: 24px; max-width: 600px; width: 100%;
   box-shadow: 0 20px 80px rgba(0,0,0,0.7); animation: fadeUp 0.3s ease;
 }
 .theme-picker-header {
@@ -790,46 +908,6 @@ html[data-theme="halloween"] body::before {
 .footer .socials a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
 .footer .socials a:hover { color: var(--accent-b); }
 
-/* ============================================================
-   WATERMARK + FLOATING SEASONAL EMOJI
-   ============================================================ */
-.watermark {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 180px;
-  height: 180px;
-  pointer-events: none;
-  z-index: 0;
-  overflow: visible;
-  /* NOTE: opacity removed from parent — now on .brand-icon specifically */
-}
-.watermark .brand-icon {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  transition: opacity var(--theme-transition), background-image var(--theme-transition);
-}
-.watermark-emoji {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  user-select: none;
-  will-change: transform;
-  opacity: 0.22;
-  transition: opacity 0.4s ease;
-  filter: drop-shadow(0 0 10px var(--glow-b));
-  line-height: 1;
-}
-html[data-theme="halloween"] .watermark-emoji { filter: drop-shadow(0 0 10px var(--glow-a)); }
-html[data-theme="christmas"] .watermark-emoji { filter: drop-shadow(0 0 10px rgba(229,57,53,0.5)); }
-html[data-theme="valentine"] .watermark-emoji { filter: drop-shadow(0 0 10px rgba(236,64,122,0.6)); }
-
-/* Hide the theme toggle button completely */
-.theme-toggle { display: none !important; }
-    
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
@@ -861,7 +939,7 @@ html[data-theme="valentine"] .watermark-emoji { filter: drop-shadow(0 0 10px rgb
   }
   .nav-links.open { right: 0; }
   .nav-hamburger { display: flex; z-index: 101; }
-  .nav-gh-btn, .theme-toggle { margin-top: 8px; }
+  .nav-gh-btn { margin-top: 8px; }
   .footer .container { flex-direction: column; text-align: center; }
   .terminal-box { max-width: 100%; }
   .readme-box { padding: 20px; }
@@ -963,7 +1041,7 @@ html[data-theme="valentine"] .watermark-emoji { filter: drop-shadow(0 0 10px rgb
       <span class="status-item"><span class="status-dot" id="dotTheme"></span> theme: <span id="statusTheme">—</span></span>
       <span class="status-item"><span class="status-dot" id="dotFetch"></span> fetch: <span id="statusFetch">idle</span></span>
       <span class="status-item"><span class="status-dot ok" id="dotScripts"></span> scripts: <span id="statusScripts">0</span></span>
-      <span class="status-item" style="margin-left:auto;opacity:0.6">v2026.10-r4</span>
+      <span class="status-item" style="margin-left:auto;opacity:0.6">v2026.10-r5</span>
     </div>
     <div class="scripts-stats">
       <div class="stat-pill"><span style="color:var(--accent-a);">●</span> <strong id="statCount">0</strong> scripts</div>
@@ -973,7 +1051,7 @@ html[data-theme="valentine"] .watermark-emoji { filter: drop-shadow(0 0 10px rgb
     <div class="scripts-controls">
       <div class="scripts-search-wrapper">
         <span class="search-icon">🔍</span>
-        <input type="text" id="scriptsSearch" placeholder="Search scripts..." />
+        <input type="text" id="scriptsSearch" placeholder="Search scripts... (hint: themes)" />
       </div>
       <select id="scriptsSort" class="scripts-sort">
         <option value="az">A → Z</option>
@@ -1085,13 +1163,18 @@ html[data-theme="valentine"] .watermark-emoji { filter: drop-shadow(0 0 10px rgb
         <span class="theme-name">Valentine</span>
         <span class="theme-desc">Pink + red</span>
       </button>
+      <button class="theme-option" data-theme="snow">
+        <span class="theme-icon">❄️</span>
+        <span class="theme-name">Snow</span>
+        <span class="theme-desc">Icy blue</span>
+      </button>
       <button class="theme-option" data-theme="auto">
         <span class="theme-icon">✨</span>
         <span class="theme-name">Auto</span>
         <span class="theme-desc">Seasonal pick</span>
       </button>
     </div>
-    <p class="theme-picker-hint">Type <code>themes</code> anywhere · Esc to close</p>
+    <p class="theme-picker-hint">Type <code>themes</code> in the script search · Esc to close</p>
   </div>
 </div>
 
@@ -1164,7 +1247,7 @@ const els = {
   activeTagFilter: $('activeTagFilter'), activeTagName: $('activeTagName'),
   clearTagFilter: $('clearTagFilter'), statCount: $('statCount'),
   statLines: $('statLines'), statTags: $('statTags'),
-  themeToggle: $('themeToggle'), statusTheme: $('statusTheme'),
+  statusTheme: $('statusTheme'),
   statusFetch: $('statusFetch'), statusScripts: $('statusScripts'),
   dotTheme: $('dotTheme'), dotFetch: $('dotFetch'), dotScripts: $('dotScripts'),
   scrollProgress: $('scrollProgress'),
@@ -1248,7 +1331,7 @@ const achievements = {
 };
 
 // ============================================================
-// THEME — picker-driven, always accessible
+// THEME
 // ============================================================
 function getSeasonalTheme() { return SEASONAL[new Date().getMonth()] || null; }
 
@@ -1273,7 +1356,6 @@ function setTheme(theme) {
 }
 
 function initTheme() {
-  // Theme picker is now hidden — access via typing "themes" in the search box
   const saved = storageGet(THEME_KEY);
   if (saved === 'auto') {
     applyTheme(getSeasonalTheme() || 'matcha');
@@ -1357,6 +1439,16 @@ function initParticles() {
       ctx.fillStyle = p.color; ctx.globalAlpha = p.opacity;
       ctx.fill(); ctx.globalAlpha = 1;
     }
+    const lineRGB = (function() {
+      const theme = document.documentElement.getAttribute('data-theme');
+      switch (theme) {
+        case 'halloween': return '156, 39, 176';
+        case 'christmas': return '67, 160, 71';
+        case 'valentine': return '236, 64, 122';
+        case 'snow': return '2, 136, 209';
+        default: return '244, 143, 177';
+    }
+    })();
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
@@ -1366,7 +1458,7 @@ function initParticles() {
           const a = 0.06 * (1 - d / 120);
           ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(244, 143, 177, ${a})`; ctx.lineWidth = 0.6; ctx.stroke();
+          ctx.strokeStyle = `rgba(${lineRGB}, ${a})`; ctx.lineWidth = 0.6; ctx.stroke();
         }
       }
     }
@@ -1403,7 +1495,8 @@ function restartWatermarkEmoji() {
     matcha:    ['🍵', '🍃', '🍵', '🌿'],
     halloween: ['🎃', '🦇', '👻', '🕷️', '💀'],
     christmas: ['🎄', '❄️', '🎁', '⛄', '🌟'],
-    valentine: ['💝', '💕', '🌹', '💘', '💗']
+    valentine: ['💝', '💕', '🌹', '💘', '💗'],
+    snow:      ['❄️', '🌨️', '☃️', '⛄', '🧊']
   };
   const set = emojiMap[theme] || emojiMap.matcha;
   const items = [];
@@ -1443,7 +1536,7 @@ function restartWatermarkEmoji() {
   watermarkEmojiState.items = items;
   frame();
 }
-    
+
 // ============================================================
 // HELPERS
 // ============================================================
@@ -1905,11 +1998,11 @@ function initScriptsControls() {
   els.scriptsSearch.addEventListener('input', () => {
     const val = els.scriptsSearch.value.trim().toLowerCase();
     if (val === 'themes') {
-        els.scriptsSearch.value = '';
-        state.search = '';
-        renderScripts();
-        openThemePicker();
-        return;
+      els.scriptsSearch.value = '';
+      state.search = '';
+      renderScripts();
+      openThemePicker();
+      return;
     }
     clearTimeout(t);
     t = setTimeout(() => { state.search = els.scriptsSearch.value.trim(); renderScripts(); }, 150);
@@ -1940,7 +2033,7 @@ function initScrollProgress() {
 }
 
 // ============================================================
-// 🕯️ PORTAL — running candle + click to open + real navigation
+// 🕯️ PORTAL
 // ============================================================
 function initPortal() {
   const zone = els.portalZone;
@@ -1948,7 +2041,6 @@ function initPortal() {
   const modal = els.portalModal;
   const enterBtn = els.portalEnterBtn;
 
-  // Compute + display target URL so user can see/debug
   let docsTarget;
   try {
     docsTarget = new URL(DOCS_PATH, window.location.href).href;
@@ -1958,14 +2050,12 @@ function initPortal() {
   console.log('[67] Portal target URL:', docsTarget);
   if (els.portalDebugUrl) els.portalDebugUrl.textContent = '→ ' + docsTarget;
 
-  // --- Candle animation ---
-  const SPEED = 1.2; // px per frame @ 60fps
+  const SPEED = 1.2;
   function animateCandle(t) {
     if (!state.candleLastT) state.candleLastT = t;
     const dt = Math.min(50, t - state.candleLastT) / 16.67;
     state.candleLastT = t;
 
-    // Pause occasionally so users can click
     if (t < state.candlePauseUntil) {
       state.candleRafId = requestAnimationFrame(animateCandle);
       return;
@@ -1981,68 +2071,39 @@ function initPortal() {
     if (state.candleX >= maxX) { state.candleX = maxX; state.candleDir = -1; }
     hint.style.left = state.candleX + 'px';
 
-    // Random pause ~every 6–10 seconds
-    if (Math.random() < 0.0015) {
-      state.candlePauseUntil = t + 1200;
-    }
-
+    if (Math.random() < 0.0015) state.candlePauseUntil = t + 1200;
     state.candleRafId = requestAnimationFrame(animateCandle);
   }
-
   function startCandle() {
-    if (!state.candleRafId) {
-      state.candleLastT = 0;
-      state.candleRafId = requestAnimationFrame(animateCandle);
-    }
+    if (!state.candleRafId) { state.candleLastT = 0; state.candleRafId = requestAnimationFrame(animateCandle); }
   }
   function stopCandle() {
-    if (state.candleRafId) {
-      cancelAnimationFrame(state.candleRafId);
-      state.candleRafId = null;
-    }
+    if (state.candleRafId) { cancelAnimationFrame(state.candleRafId); state.candleRafId = null; }
   }
-
-  // Only animate when zone is on screen
   const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) startCandle();
-      else stopCandle();
-    });
+    entries.forEach(e => { if (e.isIntersecting) startCandle(); else stopCandle(); });
   }, { threshold: 0.1 });
   obs.observe(zone);
 
-  // --- Open/close ---
-  function openPortal() {
-    modal.classList.add('open');
-    achievements.unlock('portal_finder');
-  }
-  function closePortal() {
-    modal.classList.remove('open');
-  }
+  function openPortal() { modal.classList.add('open'); achievements.unlock('portal_finder'); }
+  function closePortal() { modal.classList.remove('open'); }
 
-  hint.addEventListener('click', e => {
-    e.stopPropagation();
-    openPortal();
-  });
+  hint.addEventListener('click', e => { e.stopPropagation(); openPortal(); });
   hint.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPortal(); }
   });
-
   els.portalBackdrop.addEventListener('click', closePortal);
   els.portalClose.addEventListener('click', closePortal);
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && modal.classList.contains('open')) closePortal();
   });
 
-  // --- Navigation (the actual fix) ---
   enterBtn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
     console.log('[67] 🕯️ Navigating to:', docsTarget);
     showToast('🕯️ Entering the archive...');
-    setTimeout(() => {
-      window.location.href = docsTarget;
-    }, 400);
+    setTimeout(() => { window.location.href = docsTarget; }, 400);
   });
 }
 
@@ -2208,7 +2269,6 @@ function startTetris(container) {
     ctx.fillText('Click to restart', canvas.width/2, canvas.height/2 + 45);
   }
   function draw() {
-    const cs = getComputedStyle(document.documentElement);
     ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(0,0,canvas.width,canvas.height);
     for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) {
       ctx.strokeStyle = 'rgba(255,255,255,0.04)';
@@ -2549,7 +2609,6 @@ function boot() {
     loadScripts().catch(err => showError('reload', err));
   });
 
-  // Title troll
   const original = document.title;
   const trolls = [
     '👀 yo, where you going?','come back, the Lua misses you',"i'm watching...",
@@ -2565,9 +2624,9 @@ function boot() {
     else if (!document.hidden && hidden) { hidden = false; document.title = original; }
   });
 
-  console.log('%c🎮 dxzlol/67 loaded r4', 'color:#f48fb1;font-weight:bold;font-size:14px;');
-  console.log('Seasonal:', getSeasonalTheme() || 'none');
-  console.log('Try: ↑↑↓↓←→←→BA · type "themes" · click the running 🕯️ · type "lol"');
+  console.log('%c🎮 dxzlol/67 loaded r5', 'color:#f48fb1;font-weight:bold;font-size:14px;');
+  console.log('Themes: matcha · halloween · christmas · valentine · snow');
+  console.log('Try: type "themes" in search · click the running 🕯️ · type "lol" · ↑↑↓↓←→←→BA');
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
